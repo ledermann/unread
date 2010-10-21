@@ -1,8 +1,8 @@
-class Unread_marksMigrationGenerator < Rails::Generator::Base
+class UnreadMigrationGenerator < Rails::Generator::Base
   def manifest
     record do |m|
       options = {
-        :migration_file_name => 'create_read_marks_marks'
+        :migration_file_name => 'create_read_marks'
       }
 
       m.migration_template 'migration.rb', 'db/migrate', options
