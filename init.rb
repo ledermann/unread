@@ -1,0 +1,1 @@
+require 'mark_as_read' 

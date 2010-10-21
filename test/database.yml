@@ -1,0 +1,3 @@
+sqlite3mem:
+  adapter: sqlite3
+  database: ":memory:"
