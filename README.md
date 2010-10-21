@@ -1,7 +1,7 @@
-MarkAsRead
-==========
+Unread
+======
 
-Rails plugin to manage read/unread status of anything you need.
+Rails plugin to manage read/unread status of anything you need - and it's fast.
 
 
 ## Features
@@ -11,21 +11,21 @@ Rails plugin to manage read/unread status of anything you need.
 * Supports "mark all as read" to mark **all** records as read in a single step
 * Gives you a named_scope to get the unread records for a given user
 * Needs only one additional database table
-* Great performance
+* Most important: Great performance
 
 
 ## Requirements
 
-* Rails 2.x (tested with Rails 2.3.10 only)
+* Rails 2.x (tested with Rails 2.3.10)
 * ActiveRecord (tested with SQLite and MySQL)
 * Needs a model _User_ in your application
-* Needs a timestamp field in your models (e.g. created_at)
+* Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
 ## Installation
 
-    script/plugin install git://github.com/ledermann/mark_as_read.git
-    script/generate mark_as_read_migration
+    script/plugin install git://github.com/ledermann/unread.git
+    script/generate unread_migration
     rake db:migrate
 
 
@@ -52,6 +52,16 @@ Rails plugin to manage read/unread status of anything you need.
     # Optional: Cleaning up unneeded markers
     # Do this in a cron job once a day.
     Message.cleanup_read_marks!
+
+
+## Similar tools
+
+There a two other gems/plugins doing a similar job:
+
+* http://github.com/jhnvz/mark_as_read
+* http://github.com/mbleigh/acts-as-readable
+
+Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a _find(:all)_, which should be avoided for a large amount of records. This plugin is based on a timestamp algorithm and therefore it's very fast.
 
 
 ## TODO

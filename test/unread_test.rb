@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class MarkAsReadTest < ActiveSupport::TestCase
+class UnreadTest < ActiveSupport::TestCase
   def setup
     @user = User.create! :name => 'David'
     @other_user = User.create :name => 'Matz'

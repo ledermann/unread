@@ -1,4 +1,4 @@
-module MarkAsRead
+module Unread
   def self.included(base)
     base.extend ActsAsReadable
   end
@@ -118,4 +118,4 @@ module MarkAsRead
   end
 end
 
-ActiveRecord::Base.send :include, MarkAsRead
+ActiveRecord::Base.send :include, Unread

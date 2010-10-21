@@ -5,4 +5,4 @@
   ActiveSupport::Dependencies.autoload_once_paths.delete(path) 
 end
 
-require 'mark_as_read/acts_as_readable'
+require 'unread/acts_as_readable'
