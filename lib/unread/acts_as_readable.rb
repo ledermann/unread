@@ -29,10 +29,6 @@ module Unread
       
       named_scope :unread_by, lambda { |user| 
         check_reader
-        
-        if defined?(Authorization)
-          user = Authorization.current_user if user == true
-        end
         raise ArgumentError unless user.is_a?(ReadMark.reader_class)
 
         result = { :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
