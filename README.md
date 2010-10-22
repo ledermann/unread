@@ -18,7 +18,6 @@ Rails plugin to manage read/unread status of anything you need - and it's fast.
 
 * Rails 2.x (tested with Rails 2.3.10)
 * ActiveRecord (tested with SQLite and MySQL)
-* Needs a model _User_ in your application
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
@@ -31,6 +30,10 @@ Rails plugin to manage read/unread status of anything you need - and it's fast.
 
 ## Usage
 
+    class User < ActiveRecord::Base
+      acts_as_reader
+    end
+    
     class Message < ActiveRecord::Base
       acts_as_readable :on => :created_at
     end

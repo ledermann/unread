@@ -16,6 +16,7 @@ ActiveRecord::Migration.verbose = false
 load(File.dirname(__FILE__) + "/schema.rb")
 
 class User < ActiveRecord::Base
+  acts_as_reader
 end
 
 class Email < ActiveRecord::Base

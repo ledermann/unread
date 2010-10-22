@@ -6,4 +6,7 @@ class ReadMark < ActiveRecord::Base
   
   named_scope :global, :conditions => { :readable_id => nil }
   named_scope :read, :conditions => 'readable_id IS NOT NULL'
+  
+  class_inheritable_reader :reader_class
+  class_inheritable_reader :readable_classes
 end

@@ -4,21 +4,36 @@ module Unread
   end
   
   module ActsAsReadable
+    def acts_as_reader
+      ReadMark.write_inheritable_attribute :reader_class, self
+      
+      has_many :read_marks, :dependent => :delete_all
+      
+      after_create do |user|
+        ReadMark.readable_classes.each do |klass|
+          klass.mark_as_read! :all, :for => user
+        end
+      end
+    end
+    
     def acts_as_readable(options={})
       options.reverse_merge!({ :on => :updated_at })
       class_inheritable_reader :readable_options
       write_inheritable_attribute :readable_options, options
       
       self.has_many :read_marks, :as => :readable, :dependent => :delete_all
-      User.has_many :read_marks,                   :dependent => :delete_all
-
-      User.after_create do |user|
-        self.mark_as_read! :all, :for => user
-      end
+      
+      classes = ReadMark.readable_classes || []
+      classes << self
+      ReadMark.write_inheritable_attribute :readable_classes, classes
       
       named_scope :unread_by, lambda { |user| 
-        user = Authorization.current_user if user == true 
-        raise ArgumentError unless user.is_a?(User)
+        check_reader
+        
+        if defined?(Authorization)
+          user = Authorization.current_user if user == true
+        end
+        raise ArgumentError unless user.is_a?(ReadMark.reader_class)
 
         result = { :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
                                                   AND read_marks.readable_id    = #{self.table_name}.id
@@ -38,10 +53,11 @@ module Unread
   
   module ClassMethods
     def mark_as_read!(target, options)
+      check_reader
       raise ArgumentError unless target == :all || target.is_a?(Array)
       
       user = options[:for]
-      raise ArgumentError unless user.is_a?(User)
+      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
       
       if target == :all
         reset_read_marks!(user)
@@ -63,7 +79,9 @@ module Unread
     end
     
     def global_read_mark(user)
-      raise ArgumentError unless user.is_a?(User)
+      check_reader
+      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
+      
       user.read_marks.scoped_by_readable_type(self.base_class.name).global.first
     end
     
@@ -72,25 +90,33 @@ module Unread
     end
 
     def cleanup_read_marks!
-      User.find_each do |user|
+      check_reader
+      
+      ReadMark.reader_class.find_each do |user|
         mark_as_read!(:all, :for => user) unless unread_by(user).exists?
       end
     end
     
     def reset_read_marks!(user = :all)
+      check_reader
+      
       if user == :all
         ReadMark.delete_all :readable_type => self.base_class.name
         
         ReadMark.connection.execute("
           INSERT INTO read_marks (user_id, readable_type, timestamp)
           SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
-          FROM #{User.table_name}
+          FROM #{ReadMark.reader_class.table_name}
         ")
       else
         ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
         ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
       end
       true
+    end
+    
+    def check_reader
+      raise RuntimeError, 'Plugin "unread": No reader defined!' unless ReadMark.reader_class
     end
   end
   
@@ -100,8 +126,10 @@ module Unread
     end
     
     def mark_as_read!(options)
+      self.class.check_reader
+      
       user = options[:for]
-      raise ArgumentError unless user.is_a?(User)
+      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
       
       return true unless unread?(user)
       
