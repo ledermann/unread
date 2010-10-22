@@ -56,8 +56,8 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal true, @email.unread?(@other_user)
     assert_equal [@email], Email.unread_by(@other_user)
     
-    assert_equal 1, @user.read_marks.read.count
-    assert_equal @email, @user.read_marks.read.first.readable
+    assert_equal 1, @user.read_marks.single.count
+    assert_equal @email, @user.read_marks.single.first.readable
   end
   
   def test_mark_as_read_multiple
@@ -78,22 +78,22 @@ class UnreadTest < ActiveSupport::TestCase
     Email.mark_as_read! :all, :for => @user
     @email.mark_as_read! :for => @user
     
-    assert_equal [], @user.read_marks.read
+    assert_equal [], @user.read_marks.single
   end
   
   def test_mark_as_read_twice
     @email.mark_as_read! :for => @user
     @email.mark_as_read! :for => @user
     
-    assert_equal 1, @user.read_marks.read.count
+    assert_equal 1, @user.read_marks.single.count
   end
   
   def test_mark_all_as_read
     Email.mark_as_read! :all, :for => @user
     assert_equal Time.now.to_s, Email.global_read_mark(@user).timestamp.to_s
     
-    assert_equal [], @user.read_marks.read
-    assert_equal 0, ReadMark.read.count
+    assert_equal [], @user.read_marks.single
+    assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
   end
   
@@ -104,7 +104,7 @@ class UnreadTest < ActiveSupport::TestCase
   def test_reset_read_marks_for_all
     Email.reset_read_marks!
     
-    assert_equal 0, ReadMark.read.count
+    assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
   end
   
