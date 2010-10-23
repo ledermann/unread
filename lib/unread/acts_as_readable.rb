@@ -36,7 +36,7 @@ module Unread
                                                   AND read_marks.user_id        = #{user.id}
                                                   AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}",
                    :conditions => 'read_marks.id IS NULL' }
-        if last = last_timestamp(user)
+        if last = timestamp(user)
           result[:conditions] += " AND #{self.table_name}.#{readable_options[:on]} > '#{last.to_s(:db)}'"
         end
         result
@@ -59,30 +59,29 @@ module Unread
         reset_read_marks!(user)
       elsif target.is_a?(Array)  
         ReadMark.transaction do
-          last = last_timestamp(user)
+          last = timestamp(user)
       
           target.each do |id|
             raise ArgumentError unless id.is_a?(Integer)
         
-            if rm = ReadMark.scoped_by_user_id(user.id).scoped_by_readable_type(self.base_class.name).find_by_readable_id(id)
-              rm.update_attributes! :timestamp => Time.now
-            else
-              ReadMark.create! :user_id => user.id, :timestamp => Time.now, :readable_id => id, :readable_type => self.base_class.name
-            end
+            rm = ReadMark.user(user).readable_type(self.base_class.name).find_by_readable_id(id) ||
+                 user.read_marks.build(:readable_id => id, :readable_type => self.base_class.name)
+            rm.timestamp = Time.now
+            rm.save!
           end
         end
       end
     end
     
-    def global_read_mark(user)
+    def read_mark(user)
       check_reader
       raise ArgumentError unless user.is_a?(ReadMark.reader_class)
       
-      user.read_marks.scoped_by_readable_type(self.base_class.name).global.first
+      user.read_marks.readable_type(self.base_class.name).global.first
     end
     
-    def last_timestamp(user)
-      global_read_mark(user).try(:timestamp)
+    def timestamp(user)
+      read_mark(user).try(:timestamp)
     end
 
     def cleanup_read_marks!
@@ -98,7 +97,7 @@ module Unread
       
       if user == :all
         ReadMark.delete_all :readable_type => self.base_class.name
-        
+      
         ReadMark.connection.execute("
           INSERT INTO read_marks (user_id, readable_type, timestamp)
           SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
@@ -129,15 +128,13 @@ module Unread
       
       return true unless unread?(user)
       
-      if rm = read_mark(user)
-        rm.update_attributes! :timestamp => Time.now
-      else
-        read_marks.create! :user_id => user.id, :timestamp => Time.now
-      end
+      rm = read_mark(user) || read_marks.build(:user => user)
+      rm.timestamp = Time.now
+      rm.save!
     end
 
     def read_mark(user)
-      read_marks.scoped_by_user_id(user.id).first
+      read_marks.user(user).first
     end
   end
 end

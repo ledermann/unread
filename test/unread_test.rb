@@ -90,7 +90,7 @@ class UnreadTest < ActiveSupport::TestCase
   
   def test_mark_all_as_read
     Email.mark_as_read! :all, :for => @user
-    assert_equal Time.now.to_s, Email.global_read_mark(@user).timestamp.to_s
+    assert_equal Time.now.to_s, Email.read_mark(@user).timestamp.to_s
     
     assert_equal [], @user.read_marks.single
     assert_equal 0, ReadMark.single.count
