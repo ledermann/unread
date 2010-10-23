@@ -94,18 +94,20 @@ module Unread
     
     def reset_read_marks!(user = :all)
       check_reader
+
+      ReadMark.transaction do
+        if user == :all
+          ReadMark.delete_all :readable_type => self.base_class.name
       
-      if user == :all
-        ReadMark.delete_all :readable_type => self.base_class.name
-      
-        ReadMark.connection.execute("
-          INSERT INTO read_marks (user_id, readable_type, timestamp)
-          SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
-          FROM #{ReadMark.reader_class.table_name}
-        ")
-      else
-        ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
-        ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
+          ReadMark.connection.execute("
+            INSERT INTO read_marks (user_id, readable_type, timestamp)
+            SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
+            FROM #{ReadMark.reader_class.table_name}
+          ")
+        else
+          ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
+          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
+        end
       end
       true
     end
@@ -126,11 +128,13 @@ module Unread
       user = options[:for]
       raise ArgumentError unless user.is_a?(ReadMark.reader_class)
       
-      return true unless unread?(user)
-      
-      rm = read_mark(user) || read_marks.build(:user => user)
-      rm.timestamp = Time.now
-      rm.save!
+      ReadMark.transaction do
+        if unread?(user)
+          rm = read_mark(user) || read_marks.build(:user => user)
+          rm.timestamp = Time.now
+          rm.save!
+        end
+      end
     end
 
     def read_mark(user)
