@@ -6,6 +6,7 @@ class UnreadTest < ActiveSupport::TestCase
     @other_user = User.create :name => 'Matz'
     wait
     @email1 = Email.create!
+    wait
     @email2 = Email.create!
   end
   
@@ -61,15 +62,13 @@ class UnreadTest < ActiveSupport::TestCase
   end
   
   def test_mark_as_read_multiple
-    other_mail = Email.create! :updated_at => Time.now
-    
     assert_equal true, @email1.unread?(@user)
-    assert_equal true, other_mail.unread?(@user)
+    assert_equal true, @email2.unread?(@user)
     
-    Email.mark_as_read! [ @email1.id, other_mail.id ], :for => @user
+    Email.mark_as_read! [ @email1.id, @email2.id ], :for => @user
     
     assert_equal false, @email1.unread?(@user)
-    assert_equal false, other_mail.unread?(@user)
+    assert_equal false, @email2.unread?(@user)
   end
   
   def test_mark_as_read_with_marked_all
@@ -98,9 +97,17 @@ class UnreadTest < ActiveSupport::TestCase
   end
   
   def test_cleanup_read_marks
+    assert_equal 0, @user.read_marks.single.count
     
+    @email1.mark_as_read! :for => @user
     
-    Email.cleanup_read_marks!
+    assert_equal [@email2], Email.unread_by(@user)
+    assert_equal 1, @user.read_marks.single.count
+    
+    Email.cleanup_read_marks!    
+    
+    @user.reload
+    assert_equal 0, @user.read_marks.single.count
   end
   
   def test_reset_read_marks_for_all

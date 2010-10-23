@@ -84,11 +84,22 @@ module Unread
       read_mark(user).try(:timestamp)
     end
 
+    def set_read_mark(user, timestamp)
+      rm = read_mark(user) || user.read_marks.build(:readable_type => self.base_class.name)
+      rm.timestamp = timestamp
+      rm.save!
+    end    
+
     def cleanup_read_marks!
       check_reader
       
       ReadMark.reader_class.find_each do |user|
-        mark_as_read!(:all, :for => user) unless unread_by(user).exists?
+        if oldest_timestamp = unread_by(user).minimum(readable_options[:on])
+          user.read_marks.single.older_than(oldest_timestamp).delete_all
+          set_read_mark(user, oldest_timestamp - 1.second)
+        else
+          mark_as_read!(:all, :for => user)
+        end
       end
     end
     
@@ -131,7 +142,7 @@ module Unread
       ReadMark.transaction do
         if unread?(user)
           rm = read_mark(user) || read_marks.build(:user => user)
-          rm.timestamp = Time.now
+          rm.timestamp = self.send(readable_options[:on])
           rm.save!
         end
       end
