@@ -65,7 +65,7 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal true, @email1.unread?(@user)
     assert_equal true, @email2.unread?(@user)
     
-    Email.mark_as_read! [ @email1.id, @email2.id ], :for => @user
+    Email.mark_as_read! [ @email1, @email2 ], :for => @user
     
     assert_equal false, @email1.unread?(@user)
     assert_equal false, @email2.unread?(@user)
