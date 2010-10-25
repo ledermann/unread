@@ -90,15 +90,35 @@ module Unread
       rm.save!
     end    
 
+    # A scope with all items accessable for the given user
+    # It's used in cleanup_read_marks! to support a filtered cleanup
+    # Should be overriden if a user doesn't have access to all items
+    # Default: User has access to all items and should read them all
+    #
+    # Example:
+    #   def Message.read_scope(user)
+    #     user.visible_messages
+    #   end
+    def read_scope(user)
+      self
+    end
+
     def cleanup_read_marks!
       check_reader
       
       ReadMark.reader_class.find_each do |user|
-        if oldest_timestamp = unread_by(user).minimum(readable_options[:on])
-          user.read_marks.single.older_than(oldest_timestamp).delete_all
-          set_read_mark(user, oldest_timestamp - 1.second)
-        else
-          mark_as_read!(:all, :for => user)
+        ReadMark.transaction do
+          # Get the timestamp of the oldest unread item the user has access to
+          oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
+
+          if oldest_timestamp
+            # Delete markers OLDER than this timestamp and move the global timestamp for this user
+            user.read_marks.single.older_than(oldest_timestamp).delete_all
+            set_read_mark(user, oldest_timestamp - 1.second)
+          else
+            # There is no unread item, so mark all as read (which deletes all markers)
+            mark_as_read!(:all, :for => user)
+          end
         end
       end
     end
