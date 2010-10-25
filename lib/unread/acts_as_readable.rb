@@ -36,7 +36,7 @@ module Unread
                                                   AND read_marks.user_id        = #{user.id}
                                                   AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}",
                    :conditions => 'read_marks.id IS NULL' }
-        if last = timestamp(user)
+        if last = read_timestamp(user)
           result[:conditions] += " AND #{self.table_name}.#{readable_options[:on]} > '#{last.to_s(:db)}'"
         end
         result
@@ -59,7 +59,7 @@ module Unread
         reset_read_marks!(user)
       elsif target.is_a?(Array)  
         ReadMark.transaction do
-          last = timestamp(user)
+          last = read_timestamp(user)
       
           target.each do |obj|
             raise ArgumentError unless obj.is_a?(self)
@@ -80,7 +80,7 @@ module Unread
       user.read_marks.readable_type(self.base_class.name).global.first
     end
     
-    def timestamp(user)
+    def read_timestamp(user)
       read_mark(user).try(:timestamp)
     end
 
