@@ -27,7 +27,9 @@ module Unread
       classes << self
       ReadMark.write_inheritable_attribute :readable_classes, classes
       
-      named_scope :unread_by, lambda { |user| 
+      scope_method = ActiveRecord::VERSION::MAJOR == 2 ? :named_scope : :scope
+      
+      send scope_method, :unread_by, lambda { |user| 
         check_reader
         raise ArgumentError unless user.is_a?(ReadMark.reader_class)
 

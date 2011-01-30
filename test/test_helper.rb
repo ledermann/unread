@@ -1,6 +1,6 @@
 require 'rubygems'
 
-gem 'activerecord', '< 3'
+gem 'activerecord'
 gem 'mocha'
 
 require 'test/unit'

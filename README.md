@@ -16,15 +16,38 @@ Rails plugin to manage read/unread status of anything you need - and it's fast.
 
 ## Requirements
 
-* Rails 2.x (tested with Rails 2.3.10)
+* Rails >= 2.1 (including Rails 3)
 * ActiveRecord (tested with SQLite and MySQL)
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
 ## Installation
 
-    script/plugin install git://github.com/ledermann/unread.git
-    script/generate unread_migration
+Install from Github:
+
+    Rails 2: script/plugin install git://github.com/ledermann/unread.git
+    Rails 3: rails plugin install git://github.com/ledermann/unread.git
+    
+Add this migration:
+    
+    class CreateReadMarks < ActiveRecord::Migration
+      def self.up
+        create_table :read_marks, :force => true do |t|
+          t.integer  :readable_id
+          t.integer  :user_id,       :null => false
+          t.string   :readable_type, :null => false, :limit => 20
+          t.datetime :timestamp
+        end
+        add_index :read_marks, [:user_id, :readable_type, :readable_id]
+      end
+
+      def self.down
+        drop_table :read_marks
+      end
+    end
+
+Run the migration:
+    
     rake db:migrate
 
 
@@ -102,8 +125,7 @@ Unfortunately, both of them have a lack of performance, because they calculate t
 ## TODO
 
 * Add more documentation
-* Make it ready for Rails 3
 * Build a gem
 
 
-Copyright (c) 2010 Georg Ledermann, released under the MIT license
+Copyright (c) 2010,2011 Georg Ledermann, released under the MIT license
