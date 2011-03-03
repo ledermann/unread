@@ -110,6 +110,12 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 0, @user.read_marks.single.count
   end
   
+  def test_cleanup_read_marks_not_delete_from_other_readables
+    other_read_mark = @user.read_marks.create! :readable_type => 'Foo', :readable_id => 42, :timestamp => 5.years.ago
+    Email.cleanup_read_marks!
+    assert_equal true, ReadMark.exists?(other_read_mark.id)
+  end
+  
   def test_reset_read_marks_for_all
     Email.reset_read_marks!
     

@@ -115,7 +115,7 @@ module Unread
 
           if oldest_timestamp
             # Delete markers OLDER than this timestamp and move the global timestamp for this user
-            user.read_marks.single.older_than(oldest_timestamp).delete_all
+            user.read_marks.readable_type(self.base_class.name).single.older_than(oldest_timestamp).delete_all
             set_read_mark(user, oldest_timestamp - 1.second)
           else
             # There is no unread item, so mark all as read (which deletes all markers)
