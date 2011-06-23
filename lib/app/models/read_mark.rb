@@ -4,7 +4,7 @@ class ReadMark < ActiveRecord::Base
   
   validates_presence_of :user_id, :readable_type
   
-  scope_method = respond_to?(:scope) ? :scope : :named_scope
+  scope_method = ActiveRecord::VERSION::MAJOR < 3 ? :named_scope : :scope
   
   send scope_method, :global, :conditions => { :readable_id => nil }
   send scope_method, :single, :conditions => 'readable_id IS NOT NULL'

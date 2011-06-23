@@ -31,7 +31,7 @@ module Unread
       classes << self
       ReadMark.readable_classes = classes
       
-      scope_method = respond_to?(:scope) ? :scope : :named_scope
+      scope_method = ActiveRecord::VERSION::MAJOR < 3 ? :named_scope : :scope
       
       send scope_method, :unread_by, lambda { |user| 
         check_reader
