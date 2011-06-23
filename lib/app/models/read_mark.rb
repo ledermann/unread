@@ -4,7 +4,7 @@ class ReadMark < ActiveRecord::Base
   
   validates_presence_of :user_id, :readable_type
   
-  scope_method = ActiveRecord::VERSION::MAJOR == 2 ? :named_scope : :scope
+  scope_method = respond_to?(:scope) ? :scope : :named_scope
   
   send scope_method, :global, :conditions => { :readable_id => nil }
   send scope_method, :single, :conditions => 'readable_id IS NOT NULL'
@@ -12,6 +12,9 @@ class ReadMark < ActiveRecord::Base
   send scope_method, :user,          lambda { |user|           { :conditions => { :user_id => user.id }}}
   send scope_method, :older_than,    lambda { |timestamp|      { :conditions => [ 'timestamp < ?', timestamp] }}
   
-  class_inheritable_reader :reader_class
-  class_inheritable_reader :readable_classes
+  if respond_to?(:class_attribute)
+    class_attribute :reader_class, :readable_classes
+  else
+    class_inheritable_accessor :reader_class, :readable_classes
+  end
 end

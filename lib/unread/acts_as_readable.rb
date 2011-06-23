@@ -5,7 +5,7 @@ module Unread
   
   module ActsAsReadable
     def acts_as_reader
-      ReadMark.write_inheritable_attribute :reader_class, self
+      ReadMark.reader_class = self
       
       has_many :read_marks, :dependent => :delete_all
       
@@ -18,16 +18,20 @@ module Unread
     
     def acts_as_readable(options={})
       options.reverse_merge!({ :on => :updated_at })
-      class_inheritable_reader :readable_options
-      write_inheritable_attribute :readable_options, options
+      if respond_to?(:class_attribute)
+        class_attribute :readable_options
+      else
+        class_inheritable_accessor :readable_options
+      end
+      self.readable_options = options
       
       self.has_many :read_marks, :as => :readable, :dependent => :delete_all
       
       classes = ReadMark.readable_classes || []
       classes << self
-      ReadMark.write_inheritable_attribute :readable_classes, classes
+      ReadMark.readable_classes = classes
       
-      scope_method = ActiveRecord::VERSION::MAJOR == 2 ? :named_scope : :scope
+      scope_method = respond_to?(:scope) ? :scope : :named_scope
       
       send scope_method, :unread_by, lambda { |user| 
         check_reader
