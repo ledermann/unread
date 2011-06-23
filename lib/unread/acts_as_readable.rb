@@ -18,11 +18,11 @@ module Unread
     
     def acts_as_readable(options={})
       options.reverse_merge!({ :on => :updated_at })
-      class_inheritable_reader :readable_options
+      send((Rails::VERSION::MAJOR == 3 ? :class_attribute : :class_inheritable_reader), :readable_options)
+      
       write_inheritable_attribute :readable_options, options
       
       self.has_many :read_marks, :as => :readable, :dependent => :delete_all
-      
       classes = ReadMark.readable_classes || []
       classes << self
       ReadMark.write_inheritable_attribute :readable_classes, classes
