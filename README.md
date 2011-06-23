@@ -1,7 +1,7 @@
 Unread
 ======
 
-Rails plugin to manage read/unread status of anything you need - and it's fast.
+Gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 
 ## Features
@@ -16,19 +16,22 @@ Rails plugin to manage read/unread status of anything you need - and it's fast.
 
 ## Requirements
 
-* Rails >= 2.1 (including Rails 3)
 * ActiveRecord (tested with SQLite and MySQL)
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
 ## Installation
 
-Install from Github:
-
-    Rails 2: script/plugin install git://github.com/ledermann/unread.git
-    Rails 3: rails plugin install git://github.com/ledermann/unread.git
+Step 1: Add this to your Gemfile:
+  
+    gem 'unread'
     
-Add this migration:
+  and run
+  
+    bundle
+  
+    
+Step 2: Add this migration:
     
     class CreateReadMarks < ActiveRecord::Migration
       def self.up
@@ -46,7 +49,7 @@ Add this migration:
       end
     end
 
-Run the migration:
+  and run the migration:
     
     rake db:migrate
 
@@ -82,16 +85,16 @@ Run the migration:
 
 ## How does it work?
 
-The main idea of this plugin is to manage a list of read items for every user **after** a certain timestamp.
+The main idea of this gem is to manage a list of read items for every user **after** a certain timestamp.
 
-The plugin defines a named_scope doing a LEFT JOIN to this list, so your app can get the unread items in a performant manner. Of course, other scopes can be combined.
+The gem defines a named_scope doing a LEFT JOIN to this list, so your app can get the unread items in a performant manner. Of course, other scopes can be combined.
 
 It will be ensured that the list of read items will not grow up too much:
 
 * If a user uses "mark all as read", his list is deleted and the timestamp is set to the current time.
 * If a user never uses "mark all as read", the list will grow and grow with each item he reads. But there is help: Your app can use a cleanup method which removes unnecessary list items.
 
-Overall, this plugin can be used for large tables, too. If you are in doubt, look at the generated SQL queries, here is an example:
+Overall, this gem can be used for large tables, too. If you are in doubt, look at the generated SQL queries, here is an example:
 
     # Assuming we have a user who has marked all messages as read on 2010-10-20 08:50
     current_user = User.find(42) 
@@ -119,13 +122,12 @@ There a two other gems/plugins doing a similar job:
 * http://github.com/jhnvz/mark_as_read
 * http://github.com/mbleigh/acts-as-readable
 
-Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a _find(:all)_, which should be avoided for a large amount of records. This plugin is based on a timestamp algorithm and therefore it's very fast.
+Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a _find(:all)_, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
 ## TODO
 
 * Add more documentation
-* Build a gem
 
 
 Copyright (c) 2010,2011 Georg Ledermann, released under the MIT license
