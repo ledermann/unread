@@ -12,6 +12,5 @@ class ReadMark < ActiveRecord::Base
   send scope_method, :user,          lambda { |user|           { :conditions => { :user_id => user.id }}}
   send scope_method, :older_than,    lambda { |timestamp|      { :conditions => [ 'timestamp < ?', timestamp] }}
   
-  class_inheritable_reader :reader_class
-  class_inheritable_reader :readable_classes
+  send((Rails::VERSION::MAJOR == 3 ? :class_attribute : :class_inheritable_reader), :reader_class, :readable_classes)
 end
