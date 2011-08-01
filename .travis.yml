@@ -4,3 +4,8 @@ rvm:
 gemfile:
   - ci/Gemfile.rails-2.3.x
   - ci/Gemfile.rails-3.0.x
+env:
+  - DB=sqlite
+  - DB=mysql
+before_script:
+  - "mysql -e 'create database myapp_test;' >/dev/null"

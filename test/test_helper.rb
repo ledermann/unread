@@ -10,8 +10,12 @@ require 'active_support/test_case'
 
 require File.dirname(__FILE__) + '/../init.rb'
 
-config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
-ActiveRecord::Base.establish_connection(config['sqlite3mem'])
+
+configs = YAML.load_file('test/database.yml')
+ActiveRecord::Base.configurations = configs
+
+db_name = ENV['DB'] || 'sqlite'
+ActiveRecord::Base.establish_connection(db_name)
 ActiveRecord::Migration.verbose = false
 load(File.dirname(__FILE__) + "/schema.rb")
 
