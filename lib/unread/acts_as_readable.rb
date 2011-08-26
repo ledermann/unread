@@ -40,8 +40,7 @@ module Unread
       scope_method = ActiveRecord::VERSION::MAJOR < 3 ? :named_scope : :scope
       
       send scope_method, :unread_by, lambda { |user| 
-        check_reader
-        raise ArgumentError unless user.is_a?(ReadMark.reader_class)
+        assert_reader(user)
 
         result = { :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
                                                   AND read_marks.readable_id    = #{self.table_name}.id
@@ -61,11 +60,10 @@ module Unread
   
   module ClassMethods
     def mark_as_read!(target, options)
-      check_reader
       raise ArgumentError unless target == :all || target.is_a?(Array)
       
       user = options[:for]
-      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
+      assert_reader(user)
       
       if target == :all
         reset_read_marks!(user)
@@ -86,9 +84,7 @@ module Unread
     end
     
     def read_mark(user)
-      check_reader
-      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
-      
+      assert_reader(user)
       user.read_marks.readable_type(self.base_class.name).global.first
     end
     
@@ -116,7 +112,7 @@ module Unread
     end
 
     def cleanup_read_marks!
-      check_reader
+      assert_reader
       
       ReadMark.reader_class.find_each do |user|
         ReadMark.transaction do
@@ -136,7 +132,7 @@ module Unread
     end
     
     def reset_read_marks!(user = :all)
-      check_reader
+      assert_reader
 
       ReadMark.transaction do
         if user == :all
@@ -155,8 +151,14 @@ module Unread
       true
     end
     
-    def check_reader
-      raise RuntimeError, 'Plugin "unread": No reader defined!' unless ReadMark.reader_class
+    def assert_reader(user=nil)
+      if ReadMark.reader_class
+        if user && !user.is_a?(ReadMark.reader_class)
+          raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader!"
+        end
+      else
+        raise RuntimeError, 'There is no class using acts_as_reader!'
+      end
     end
   end
   
@@ -166,10 +168,8 @@ module Unread
     end
     
     def mark_as_read!(options)
-      self.class.check_reader
-      
       user = options[:for]
-      raise ArgumentError unless user.is_a?(ReadMark.reader_class)
+      self.class.assert_reader(user)
       
       ReadMark.transaction do
         if unread?(user)

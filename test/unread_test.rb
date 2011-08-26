@@ -26,6 +26,10 @@ class UnreadTest < ActiveSupport::TestCase
     
     assert_equal 2, Email.unread_by(@user).count
     assert_equal 2, Email.unread_by(@other_user).count
+    
+    assert_raise(ArgumentError) {
+      Email.unread_by(42)
+    }
   end
   
   def test_scope_after_reset
@@ -35,9 +39,13 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 1, Email.unread_by(@user).count
   end
 
-  def test_unread_by
+  def test_unread_after_create
     assert_equal true, @email1.unread?(@user)
     assert_equal true, @email1.unread?(@other_user)
+    
+    assert_raise(ArgumentError) {
+      @email1.unread?(42)
+    }
   end
   
   def test_unread_after_update
