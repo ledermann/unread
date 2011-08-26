@@ -11,7 +11,7 @@ require 'active_support/test_case'
 require File.dirname(__FILE__) + '/../init.rb'
 
 
-configs = YAML.load_file('test/database.yml')
+configs = YAML.load_file(File.dirname(__FILE__) + '/database.yml')
 ActiveRecord::Base.configurations = configs
 
 db_name = ENV['DB'] || 'sqlite'
