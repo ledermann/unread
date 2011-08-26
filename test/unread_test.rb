@@ -123,18 +123,6 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 2, ReadMark.global.count
   end
   
-  def test_multiple_acts_as_reader
-    assert_raise(RuntimeError) {
-      User.acts_as_reader
-    }
-  end
-  
-  def test_multiple_acts_as_readable
-    assert_raise(RuntimeError) {
-      Email.acts_as_readable
-    }
-  end
-  
 private
   def wait
     # Skip one second
