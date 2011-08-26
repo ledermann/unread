@@ -5,6 +5,10 @@ module Unread
   
   module ActsAsReadable
     def acts_as_reader
+      if ReadMark.reader_class
+        raise RuntimeError, "acts_as_reader is called twice. Please make sure to use it only one time in one class."
+      end
+      
       ReadMark.reader_class = self
       
       has_many :read_marks, :dependent => :delete_all
@@ -17,6 +21,10 @@ module Unread
     end
     
     def acts_as_readable(options={})
+      if ReadMark.readable_classes.try(:include?, self)
+        raise RuntimeError, "acts_as_readable is called twice. Please make sure to use it only one time per class."
+      end
+      
       options.reverse_merge!({ :on => :updated_at })
       if respond_to?(:class_attribute)
         class_attribute :readable_options
