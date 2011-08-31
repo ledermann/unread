@@ -1,3 +1,9 @@
+0.0.4 - 2011/08/31
+
+* Ignore multiple calls of acts_as_*
+* Improved error messages
+* Tested with Rails 3.1
+
 0.0.3 - 2011/08/01
 
 * Fixed gemspec by adding development dependencies
