@@ -1,15 +1,8 @@
 require 'rubygems'
-
-gem 'activerecord'
-gem 'mocha'
-
 require 'test/unit'
 require 'active_record'
-require 'active_support'
-require 'active_support/test_case'
 
 require File.dirname(__FILE__) + '/../init.rb'
-
 
 configs = YAML.load_file(File.dirname(__FILE__) + '/database.yml')
 ActiveRecord::Base.configurations = configs
@@ -26,3 +19,6 @@ end
 class Email < ActiveRecord::Base
   acts_as_readable :on => :updated_at
 end
+
+require 'active_record/version'
+puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING}"
