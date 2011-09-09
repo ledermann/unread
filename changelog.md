@@ -1,3 +1,7 @@
+0.0.5 - 2011/09/09
+
+* Fixed class loading issue in development environment
+
 0.0.4 - 2011/08/31
 
 * Ignore multiple calls of acts_as_*
