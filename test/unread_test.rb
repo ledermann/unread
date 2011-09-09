@@ -19,6 +19,14 @@ class UnreadTest < ActiveSupport::TestCase
   def test_schema_has_loaded_correctly
     assert_equal [@email1, @email2], Email.all
   end
+  
+  def test_readable_classes
+    assert_equal [ Email ], ReadMark.readable_classes
+  end
+  
+  def test_reader_class
+    assert_equal User, ReadMark.reader_class
+  end
 
   def test_scope
     assert_equal [@email1, @email2], Email.unread_by(@user)
