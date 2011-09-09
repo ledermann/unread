@@ -5,9 +5,6 @@ module Unread
   
   module ActsAsReadable
     def acts_as_reader
-      # Ignore multiple calls
-      return if ReadMark.reader_class
-      
       ReadMark.reader_class = self
       
       has_many :read_marks, :dependent => :delete_all
@@ -20,22 +17,19 @@ module Unread
     end
     
     def acts_as_readable(options={})
-      # Ignore multiple calls
-      return if self.included_modules.include?(InstanceMethods)
-      
-      options.reverse_merge!({ :on => :updated_at })
       if respond_to?(:class_attribute)
         class_attribute :readable_options
       else
         class_inheritable_accessor :readable_options
       end
+
+      options.reverse_merge!({ :on => :updated_at })
       self.readable_options = options
       
-      self.has_many :read_marks, :as => :readable, :dependent => :delete_all
+      has_many :read_marks, :as => :readable, :dependent => :delete_all
       
-      classes = ReadMark.readable_classes || []
-      classes << self
-      ReadMark.readable_classes = classes
+      ReadMark.readable_classes ||= []
+      ReadMark.readable_classes << self unless ReadMark.readable_classes.map(&:name).include?(self.name)
       
       scope_method = ActiveRecord::VERSION::MAJOR < 3 ? :named_scope : :scope
       
