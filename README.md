@@ -1,16 +1,17 @@
 Unread
 ======
 
-Gem to manage read/unread status of ActiveRecord objects - and it's fast.
+Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 [![Build Status](https://secure.travis-ci.org/ledermann/unread.png)](http://travis-ci.org/ledermann/unread)
 
+
 ## Features
 
-* Manages unread records for anything you want your users to read (like messages, documents, comments etc.)
-* Supports "mark as read" to mark a **single** record as read
-* Supports "mark all as read" to mark **all** records as read in a single step
-* Gives you a named_scope to get the unread records for a given user
+* Manages unread records for anything you want users to read (like messages, documents, comments etc.)
+* Supports _mark as read_ to mark a **single** record as read
+* Supports _mark all as read__ to mark **all** records as read in a single step
+* Gives you a scope to get the unread records for a given user
 * Needs only one additional database table
 * Most important: Great performance
 
@@ -18,7 +19,7 @@ Gem to manage read/unread status of ActiveRecord objects - and it's fast.
 ## Requirements
 
 * Ruby 1.8.7 or 1.9.2
-* ActiveRecord 2.3.x, 3.0.x, 3.1.x (tested with SQLite and MySQL)
+* Rails 2.3.x, 3.0.x, 3.1.x (tested with SQLite and MySQL)
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
@@ -87,9 +88,9 @@ Step 2: Add this migration:
 
 ## How does it work?
 
-The main idea of this gem is to manage a list of read items for every user **after** a certain timestamp.
+The main idea of this gem is to manage a list of read items for every reader **after** a certain timestamp.
 
-The gem defines a named_scope doing a LEFT JOIN to this list, so your app can get the unread items in a performant manner. Of course, other scopes can be combined.
+The gem defines a scope doing a LEFT JOIN to this list, so your app can get the unread items in a performant manner. Of course, other scopes can be combined.
 
 It will be ensured that the list of read items will not grow up too much:
 
@@ -114,22 +115,17 @@ Overall, this gem can be used for large tables, too. If you are in doubt, look a
     #     WHERE read_marks.id IS NULL 
     #     AND messages.created_at > '2010-10-20 08:50:00'
 
-    Hint: You should add a database index on messages.created_at.
+Hint: You should add a database index on `messages.created_at`.
 
 
 ## Similar tools
 
-There a two other gems/plugins doing a similar job:
+There are two other gems/plugins doing a similar job:
 
 * http://github.com/jhnvz/mark_as_read
 * http://github.com/mbleigh/acts-as-readable
 
-Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a _find(:all)_, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
-
-
-## TODO
-
-* Add more documentation
+Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a `find(:all)`, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
 Copyright (c) 2010,2011 Georg Ledermann, released under the MIT license
