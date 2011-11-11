@@ -18,7 +18,7 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 ## Requirements
 
-* Ruby 1.8.7 or 1.9.2
+* Ruby 1.8.7 or 1.9.x
 * Rails 2.3.x, 3.0.x, 3.1.x (tested with SQLite and MySQL)
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
@@ -29,7 +29,7 @@ Step 1: Add this to your Gemfile:
   
     gem 'unread'
     
-  and run
+and run
   
     bundle
   
@@ -94,10 +94,10 @@ The gem defines a scope doing a LEFT JOIN to this list, so your app can get the 
 
 It will be ensured that the list of read items will not grow up too much:
 
-* If a user uses "mark all as read", his list is deleted and the timestamp is set to the current time.
+* If a user uses "mark all as read", his list gets deleted and the timestamp is set to the current time.
 * If a user never uses "mark all as read", the list will grow and grow with each item he reads. But there is help: Your app can use a cleanup method which removes unnecessary list items.
 
-Overall, this gem can be used for large tables, too. If you are in doubt, look at the generated SQL queries, here is an example:
+Overall, this gem can be used for large data. Please have a look at the generated SQL queries, here is an example:
 
     # Assuming we have a user who has marked all messages as read on 2010-10-20 08:50
     current_user = User.find(42) 
