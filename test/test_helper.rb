@@ -15,7 +15,7 @@ ActiveRecord::Base.establish_connection(db_name)
 ActiveRecord::Migration.verbose = false
 load(File.dirname(__FILE__) + "/schema.rb")
 
-class User < ActiveRecord::Base
+class Reader < ActiveRecord::Base
   acts_as_reader
 end
 
