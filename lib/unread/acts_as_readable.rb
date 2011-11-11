@@ -5,7 +5,7 @@ module Unread
   
   module ActsAsReadable
     def acts_as_reader
-      ReadMark.reader_class = self
+      ReadMark.belongs_to :user, :class_name => self.to_s
       
       has_many :read_marks, :dependent => :delete_all
       
