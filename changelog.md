@@ -1,3 +1,9 @@
+0.0.6 - 2011/11/11
+
+* Fixed #5: Gemspec dependency fix (thanks to @bricker88)
+* Fixed #6: Removed hard coded dependency on a class named "User" (thanks to @mixandgo)
+* Some cleanup
+
 0.0.5 - 2011/09/09
 
 * Fixed class loading issue in development environment
