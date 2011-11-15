@@ -10,7 +10,7 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 * Manages unread records for anything you want users to read (like messages, documents, comments etc.)
 * Supports _mark as read_ to mark a **single** record as read
-* Supports _mark all as read__ to mark **all** records as read in a single step
+* Supports _mark all as read_ to mark **all** records as read in a single step
 * Gives you a scope to get the unread records for a given user
 * Needs only one additional database table
 * Most important: Great performance
