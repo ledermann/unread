@@ -1,3 +1,7 @@
+0.0.7 - not yet released
+
+* Cleanup files
+
 0.0.6 - 2011/11/11
 
 * Fixed #5: Gemspec dependency fix (thanks to @bricker88)

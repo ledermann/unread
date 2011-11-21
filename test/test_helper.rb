@@ -4,8 +4,7 @@ require 'test/unit'
 require 'active_support'
 require 'active_support/test_case'
 require 'active_record'
-
-require File.dirname(__FILE__) + '/../init.rb'
+require 'unread'
 
 configs = YAML.load_file(File.dirname(__FILE__) + '/database.yml')
 ActiveRecord::Base.configurations = configs
