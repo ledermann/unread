@@ -19,7 +19,7 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 ## Requirements
 
 * Ruby 1.8.7 or 1.9.x
-* Rails 2.3.x, 3.0.x, 3.1.x (tested with SQLite and MySQL)
+* Rails 2.3.x and 3.x (tested with SQLite and MySQL)
 * Needs a timestamp field in your models (e.g. created_at) with a database index on it
 
 
@@ -128,4 +128,4 @@ There are two other gems/plugins doing a similar job:
 Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a `find(:all)`, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
-Copyright (c) 2010,2011 Georg Ledermann, released under the MIT license
+Copyright (c) 2010,2012 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
