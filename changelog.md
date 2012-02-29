@@ -1,4 +1,4 @@
-0.0.7 - not yet released
+0.0.7 - 2012/02/29
 
 * Cleanup files
 * acts_as_reader: Using inverse_of (available since Rails 2.3.6)
