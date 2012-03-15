@@ -40,6 +40,18 @@ class UnreadTest < ActiveSupport::TestCase
     }
   end
   
+  def test_with_read_marks_for
+    @email1.mark_as_read! :for => @reader
+    
+    emails = Email.with_read_marks_for(@reader).all
+
+    assert emails[0].read_mark_id.present?
+    assert emails[1].read_mark_id.nil?
+    
+    assert_equal false, emails[0].unread?(@reader)
+    assert_equal true, emails[1].unread?(@reader)
+  end
+  
   def test_scope_after_reset
     @email1.mark_as_read! :for => @reader
     

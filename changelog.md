@@ -1,3 +1,7 @@
+0.1.0 - unreleased
+
+* Added scope "with_read_marks_for"
+
 0.0.7 - 2012/02/29
 
 * Cleanup files

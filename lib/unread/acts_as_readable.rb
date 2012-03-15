@@ -49,6 +49,15 @@ module Unread
         result
       }
       
+      send scope_method, :with_read_marks_for, lambda { |user| 
+        assert_reader(user)
+      
+        { :select => "#{self.table_name}.*, read_marks.id AS read_mark_id",
+          :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
+                                         AND read_marks.readable_id    = #{self.table_name}.id
+                                         AND read_marks.user_id        = #{user.id}
+                                         AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}" }
+      }
       extend ReadableClassMethods
       include ReadableInstanceMethods
     end
@@ -149,7 +158,18 @@ module Unread
   
   module ReadableInstanceMethods 
     def unread?(user)
-      self.class.unread_by(user).exists?(self)
+      if self.respond_to?(:read_mark_id)
+        # For use with scope "with_read_marks_for"
+        return false if self.read_mark_id
+        
+        if global_timestamp = user.read_mark_global(self.class).try(:timestamp)
+          self.send(readable_options[:on]) > global_timestamp
+        else
+          true
+        end
+      else
+        self.class.unread_by(user).exists?(self)
+      end
     end
     
     def mark_as_read!(options)

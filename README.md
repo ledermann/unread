@@ -71,12 +71,21 @@ Step 2: Add this migration:
     message1 = Message.create!
     message2 = Message.create!
     
+    ## Get unread messages for a given user
     Message.unread_by(current_user)
     # => [ message1, message2 ]
     
     message1.mark_as_read! :for => current_user
     Message.unread_by(current_user)
     # => [ message2 ]
+    
+    ## Get all messages including the read status for a given user
+    messages = Message.with_read_marks_for(current_user)
+    # => [ message1, message2 ]
+    messages[0].unread?(current_user)
+    # => false
+    messages[1].unread?(current_user)
+    # => true
     
     Message.mark_as_read! :all, :for => current_user
     Message.unread_by(current_user)
