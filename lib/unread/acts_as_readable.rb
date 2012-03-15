@@ -14,6 +14,8 @@ module Unread
           klass.mark_as_read! :all, :for => user
         end
       end
+      
+      include ReaderInstanceMethods
     end
     
     def acts_as_readable(options={})
@@ -41,18 +43,18 @@ module Unread
                                                   AND read_marks.user_id        = #{user.id}
                                                   AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}",
                    :conditions => 'read_marks.id IS NULL' }
-        if last = read_timestamp(user)
-          result[:conditions] += " AND #{self.table_name}.#{readable_options[:on]} > '#{last.to_s(:db)}'"
+        if global_time_stamp = user.read_mark_global(self).try(:timestamp)
+          result[:conditions] += " AND #{self.table_name}.#{readable_options[:on]} > '#{global_time_stamp.to_s(:db)}'"
         end
         result
       }
       
-      extend ClassMethods
-      include InstanceMethods
+      extend ReadableClassMethods
+      include ReadableInstanceMethods
     end
   end
   
-  module ClassMethods
+  module ReadableClassMethods
     def mark_as_read!(target, options)
       raise ArgumentError unless target == :all || target.is_a?(Array)
       
@@ -63,8 +65,6 @@ module Unread
         reset_read_marks!(user)
       elsif target.is_a?(Array)  
         ReadMark.transaction do
-          last = read_timestamp(user)
-      
           target.each do |obj|
             raise ArgumentError unless obj.is_a?(self)
         
@@ -77,17 +77,8 @@ module Unread
       end
     end
     
-    def read_mark(user)
-      assert_reader(user)
-      user.read_marks.readable_type(self.base_class.name).global.first
-    end
-    
-    def read_timestamp(user)
-      read_mark(user).try(:timestamp)
-    end
-
     def set_read_mark(user, timestamp)
-      rm = read_mark(user) || user.read_marks.build(:readable_type => self.base_class.name)
+      rm = user.read_mark_global(self) || user.read_marks.build(:readable_type => self.base_class.name)
       rm.timestamp = timestamp
       rm.save!
     end    
@@ -156,7 +147,7 @@ module Unread
     end
   end
   
-  module InstanceMethods 
+  module ReadableInstanceMethods 
     def unread?(user)
       self.class.unread_by(user).exists?(self)
     end
@@ -176,6 +167,16 @@ module Unread
 
     def read_mark(user)
       read_marks.user(user).first
+    end
+  end
+  
+  module ReaderInstanceMethods
+    def read_mark_global(klass)
+      instance_var_name = "@read_mark_global_#{klass.name}"
+      instance_variable_get(instance_var_name) || begin # memoize
+        obj = self.read_marks.readable_type(klass.base_class.name).global.first
+        instance_variable_set(instance_var_name, obj)
+      end
     end
   end
 end
