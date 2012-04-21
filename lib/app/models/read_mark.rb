@@ -1,5 +1,6 @@
 class ReadMark < ActiveRecord::Base
   belongs_to :readable, :polymorphic => true
+  attr_accessible :readable_id, :user_id, :readable_type, :timestamp
   
   validates_presence_of :user_id, :readable_type
   
