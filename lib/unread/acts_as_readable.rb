@@ -178,7 +178,7 @@ module Unread
       
       ReadMark.transaction do
         if unread?(user)
-          rm = read_mark(user) || read_marks.build(:user => user)
+          rm = read_mark(user) || read_marks.build(:user_id => user.id)
           rm.timestamp = self.send(readable_options[:on])
           rm.save!
         end

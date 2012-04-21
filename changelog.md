@@ -1,6 +1,7 @@
-0.1.0 - unreleased
+0.1.0 - 2012/04/21
 
 * Added scope "with_read_marks_for"
+* Fixed #7: Added attr_accessible to all ReadMark attributes (thanks to @negative)
 
 0.0.7 - 2012/02/29
 
