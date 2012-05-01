@@ -1,3 +1,7 @@
+0.1.1 - 2012/05/01
+
+* Fixed handling namespaced classes. Closes #10 (thanks to @stanislaw)
+
 0.1.0 - 2012/04/21
 
 * Added scope "with_read_marks_for"
