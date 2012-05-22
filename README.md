@@ -27,73 +27,78 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 ## Installation
 
 Step 1: Add this to your Gemfile:
-  
-    gem 'unread'
-    
-and run
-  
-    bundle
-  
-    
-Step 2: Add this migration:
-    
-    class CreateReadMarks < ActiveRecord::Migration
-      def self.up
-        create_table :read_marks, :force => true do |t|
-          t.integer  :readable_id
-          t.integer  :user_id,       :null => false
-          t.string   :readable_type, :null => false, :limit => 20
-          t.datetime :timestamp
-        end
-        add_index :read_marks, [:user_id, :readable_type, :readable_id]
-      end
 
-      def self.down
-        drop_table :read_marks
-      end
+    gem 'unread'
+
+and run
+
+    bundle
+
+
+Step 2: Add this migration:
+
+```ruby
+class CreateReadMarks < ActiveRecord::Migration
+  def self.up
+    create_table :read_marks, :force => true do |t|
+      t.integer  :readable_id
+      t.integer  :user_id,       :null => false
+      t.string   :readable_type, :null => false, :limit => 20
+      t.datetime :timestamp
     end
 
+    add_index :read_marks, [:user_id, :readable_type, :readable_id]
+  end
+
+  def self.down
+    drop_table :read_marks
+  end
+end
+```
+
   and run the migration:
-    
+
     rake db:migrate
 
 
 ## Usage
 
-    class User < ActiveRecord::Base
-      acts_as_reader
-    end
-    
-    class Message < ActiveRecord::Base
-      acts_as_readable :on => :created_at
-    end
+```ruby
+class User < ActiveRecord::Base
+  acts_as_reader
+end
 
-    message1 = Message.create!
-    message2 = Message.create!
-    
-    ## Get unread messages for a given user
-    Message.unread_by(current_user)
-    # => [ message1, message2 ]
-    
-    message1.mark_as_read! :for => current_user
-    Message.unread_by(current_user)
-    # => [ message2 ]
-    
-    ## Get all messages including the read status for a given user
-    messages = Message.with_read_marks_for(current_user)
-    # => [ message1, message2 ]
-    messages[0].unread?(current_user)
-    # => false
-    messages[1].unread?(current_user)
-    # => true
-    
-    Message.mark_as_read! :all, :for => current_user
-    Message.unread_by(current_user)
-    # => [ ]
-    
-    # Optional: Cleaning up unneeded markers
-    # Do this in a cron job once a day.
-    Message.cleanup_read_marks!
+class Message < ActiveRecord::Base
+  acts_as_readable :on => :created_at
+end
+
+message1 = Message.create!
+message2 = Message.create!
+
+## Get unread messages for a given user
+Message.unread_by(current_user)
+# => [ message1, message2 ]
+
+message1.mark_as_read! :for => current_user
+Message.unread_by(current_user)
+# => [ message2 ]
+
+## Get all messages including the read status for a given user
+messages = Message.with_read_marks_for(current_user)
+# => [ message1, message2 ]
+messages[0].unread?(current_user)
+# => false
+messages[1].unread?(current_user)
+# => true
+
+Message.mark_as_read! :all, :for => current_user
+Message.unread_by(current_user)
+# => [ ]
+
+# Optional: Cleaning up unneeded markers
+# Do this in a cron job once a day.
+Message.cleanup_read_marks!
+```
 
 
 ## How does it work?
@@ -109,21 +114,26 @@ It will be ensured that the list of read items will not grow up too much:
 
 Overall, this gem can be used for large data. Please have a look at the generated SQL queries, here is an example:
 
-    # Assuming we have a user who has marked all messages as read on 2010-10-20 08:50
-    current_user = User.find(42) 
-    
-    # Get the unread messages for this user
-    Message.unread_by(current_user)
-    
-    # => 
-    #     SELECT messages.* 
-    #     FROM messages
-    #     LEFT JOIN read_marks ON read_marks.readable_type = 'Message'
-    #                         AND read_marks.readable_id = messages.id
-    #                         AND read_marks.user_id = 42
-    #                         AND read_marks.timestamp >= messages.created_at 
-    #     WHERE read_marks.id IS NULL 
-    #     AND messages.created_at > '2010-10-20 08:50:00'
+```ruby
+# Assuming we have a user who has marked all messages as read on 2010-10-20 08:50
+current_user = User.find(42)
+
+# Get the unread messages for this user
+Message.unread_by(current_user)
+```
+
+Generates query: 
+
+```sql
+SELECT messages.*
+FROM messages
+LEFT JOIN read_marks ON read_marks.readable_type = 'Message'
+                    AND read_marks.readable_id = messages.id
+                    AND read_marks.user_id = 42
+                    AND read_marks.timestamp >= messages.created_at
+WHERE read_marks.id IS NULL
+AND messages.created_at > '2010-10-20 08:50:00'
+```
 
 Hint: You should add a database index on `messages.created_at`.
 
