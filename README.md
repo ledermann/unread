@@ -138,6 +138,32 @@ AND messages.created_at > '2010-10-20 08:50:00'
 Hint: You should add a database index on `messages.created_at`.
 
 
+## Testing
+
+### Rspec
+
+In your tests you will need unread_macros.rb file to fake wait a second after creating an instance, that acts_as_unread:
+
+```ruby
+module UnreadMacros
+  def wait
+    # Skip one second
+    now = Time.now + 1.second
+    Time.stubs(:now).returns(now)
+  end
+end
+```
+
+Place it in your spec/support directory and modify spec_helper.rb file:
+
+```ruby
+RSpec.configure do |config|
+  ...
+  
+  config.include UnreadMacros
+end
+```
+
 ## Similar tools
 
 There are two other gems/plugins doing a similar job:
