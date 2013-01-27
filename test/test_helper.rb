@@ -12,15 +12,12 @@ ActiveRecord::Base.establish_connection(db_name)
 ActiveRecord::Migration.verbose = false
 load(File.dirname(__FILE__) + "/schema.rb")
 
-module App
-  class Reader < ActiveRecord::Base
-    acts_as_reader
-  end
-
-  class Email < ActiveRecord::Base
-    acts_as_readable :on => :updated_at
-  end
+class Reader < ActiveRecord::Base
+  acts_as_reader
 end
-include App
+
+class Email < ActiveRecord::Base
+  acts_as_readable :on => :updated_at
+end
 
 puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING}"
