@@ -18,10 +18,10 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 ## Requirements
 
-* Ruby 1.8.7 or 1.9.x
+* Ruby 1.8.7 or 1.9.3
 * Rails >= 2.3.6 (including 3.0, 3.1, 3.2)
 * Tested with SQLite and MySQL
-* Needs a timestamp field in your models (e.g. created_at) with a database index on it
+* Needs a timestamp field in your models (like created_at or updated_at) with a database index on it
 
 
 ## Installation
@@ -95,7 +95,7 @@ Message.mark_as_read! :all, :for => current_user
 Message.unread_by(current_user)
 # => [ ]
 
-# Optional: Cleaning up unneeded markers
+# Optional: Cleaning up unneeded markers.
 # Do this in a cron job once a day.
 Message.cleanup_read_marks!
 ```
@@ -122,7 +122,7 @@ current_user = User.find(42)
 Message.unread_by(current_user)
 ```
 
-Generates query: 
+Generated query: 
 
 ```sql
 SELECT messages.*
@@ -148,4 +148,4 @@ There are two other gems/plugins doing a similar job:
 Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a `find(:all)`, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
-Copyright (c) 2010,2012 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
+Copyright (c) 2010-2013 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
