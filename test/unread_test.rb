@@ -48,11 +48,15 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal true, emails[1].unread?(@reader)
   end
   
-  def scope_param_check
-    [ 42, nil, 'foo', :foo, {} ].each do |not_a_user|
-      assert_raise(ArgumentError) { Email.unread_by(not_a_user)}
-      assert_raise(ArgumentError) { Email.with_read_marks_for(not_a_user)}
+  def test_scope_param_check
+    [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+      assert_raise(ArgumentError) { Email.unread_by(not_a_reader)}
+      assert_raise(ArgumentError) { Email.with_read_marks_for(not_a_reader)}
     end
+    
+    unsaved_reader = Reader.new
+    assert_raise(ArgumentError) { Email.unread_by(unsaved_reader)}
+    assert_raise(ArgumentError) { Email.with_read_marks_for(unsaved_reader)}
   end
   
   def test_scope_after_reset
