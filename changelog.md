@@ -1,4 +1,4 @@
-HEAD
+0.1.2 - 2013/01/27
 
 * Scopes: Improved parameter check
 
