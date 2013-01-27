@@ -106,7 +106,7 @@ module Unread
     end
 
     def cleanup_read_marks!
-      assert_reader
+      assert_reader_class
       
       ReadMark.reader_class.find_each do |user|
         ReadMark.transaction do
@@ -126,7 +126,7 @@ module Unread
     end
     
     def reset_read_marks!(user = :all)
-      assert_reader
+      assert_reader_class
 
       ReadMark.transaction do
         if user == :all
@@ -145,12 +145,16 @@ module Unread
       true
     end
     
-    def assert_reader(user=nil)
-      if ReadMark.reader_class
-        if user && !user.is_a?(ReadMark.reader_class)
-          raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader!"
-        end
-      else
+    def assert_reader(user)
+      assert_reader_class
+      
+      unless user.is_a?(ReadMark.reader_class)
+        raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader!"
+      end
+    end
+    
+    def assert_reader_class
+      unless ReadMark.reader_class
         raise RuntimeError, 'There is no class using acts_as_reader!'
       end
     end

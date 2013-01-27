@@ -1,3 +1,7 @@
+HEAD
+
+* Scopes: Improved parameter check
+
 0.1.1 - 2012/05/01
 
 * Fixed handling namespaced classes. Closes #10 (thanks to @stanislaw)
