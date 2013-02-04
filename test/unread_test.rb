@@ -160,8 +160,6 @@ class UnreadTest < ActiveSupport::TestCase
   
 private
   def wait
-    # Skip one second
-    now = Time.now + 1.second
-    Time.stubs(:now).returns(now)
+    Timecop.travel(1.minute)
   end
 end

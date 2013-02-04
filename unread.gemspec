@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'activerecord', '>= 2.3.6'
   
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'mocha', "~> 0.12.8"
+  s.add_development_dependency 'timecop'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'mysql2'
 end
