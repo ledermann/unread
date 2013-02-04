@@ -28,11 +28,15 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 Step 1: Add this to your Gemfile:
 
-    gem 'unread'
+```ruby
+gem 'unread'
+```
 
 and run
 
-    bundle
+```shell
+bundle
+```
 
 
 Step 2: Add this migration:
@@ -58,7 +62,9 @@ end
 
   and run the migration:
 
-    rake db:migrate
+```shell
+rake db:migrate
+```
 
 
 ## Usage
