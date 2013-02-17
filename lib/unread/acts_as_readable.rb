@@ -10,6 +10,9 @@ module Unread
       has_many :read_marks, :dependent => :delete_all, :foreign_key => 'user_id', :inverse_of => :user
 
       after_create do |user|
+        # We assume that a new user should not be tackled by tons of old messages
+        # created BEFORE he signed up.
+        # Instead, the new user starts with zero unread messages
         (ReadMark.readable_classes || []).each do |klass|
           klass.mark_as_read! :all, :for => user
         end
