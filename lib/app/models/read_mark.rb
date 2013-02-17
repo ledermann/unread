@@ -1,9 +1,9 @@
 class ReadMark < ActiveRecord::Base
   belongs_to :readable, :polymorphic => true
   attr_accessible :readable_id, :user_id, :readable_type, :timestamp
-  
+
   validates_presence_of :user_id, :readable_type
-  
+
   scope :global, where(:readable_id => nil)
   scope :single, where('readable_id IS NOT NULL')
   scope :readable_type, lambda { |readable_type | where(:readable_type => readable_type) }
@@ -14,6 +14,6 @@ class ReadMark < ActiveRecord::Base
   def self.reader_class
     reflect_on_all_associations(:belongs_to).find { |assoc| assoc.name == :user }.try(:klass)
   end
-  
+
   class_attribute :readable_classes
 end

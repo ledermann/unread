@@ -128,7 +128,7 @@ current_user = User.find(42)
 Message.unread_by(current_user)
 ```
 
-Generated query: 
+Generated query:
 
 ```sql
 SELECT messages.*
