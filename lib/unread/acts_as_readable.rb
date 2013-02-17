@@ -19,45 +19,40 @@ module Unread
     end
     
     def acts_as_readable(options={})
-      if respond_to?(:class_attribute)
-        class_attribute :readable_options
-      else
-        class_inheritable_accessor :readable_options
-      end
+      class_attribute :readable_options
 
-      options.reverse_merge!({ :on => :updated_at })
+      options.reverse_merge!(:on => :updated_at)
       self.readable_options = options
       
       has_many :read_marks, :as => :readable, :dependent => :delete_all
       
       ReadMark.readable_classes ||= []
-      ReadMark.readable_classes << self unless ReadMark.readable_classes.map(&:name).include?(self.name)
+      ReadMark.readable_classes << self unless ReadMark.readable_classes.include?(self)
       
-      scope_method = ActiveRecord::VERSION::MAJOR < 3 ? :named_scope : :scope
-      
-      send scope_method, :unread_by, lambda { |user| 
+      scope :join_read_marks, lambda { |user|
         assert_reader(user)
 
-        result = { :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
-                                                  AND read_marks.readable_id    = #{self.table_name}.id
-                                                  AND read_marks.user_id        = #{user.id}
-                                                  AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}",
-                   :conditions => 'read_marks.id IS NULL' }
+        joins "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
+                                   AND read_marks.readable_id    = #{self.table_name}.id
+                                   AND read_marks.user_id        = #{user.id}
+                                   AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}"
+      }
+
+      scope :unread_by, lambda { |user| 
+        result = join_read_marks(user).
+                 where('read_marks.id IS NULL')
+
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result[:conditions] += " AND #{self.table_name}.#{readable_options[:on]} > '#{global_time_stamp.to_s(:db)}'"
+          result = result.where("#{self.table_name}.#{readable_options[:on]} > '#{global_time_stamp.to_s(:db)}'")
         end
+
         result
       }
-      
-      send scope_method, :with_read_marks_for, lambda { |user| 
-        assert_reader(user)
-      
-        { :select => "#{self.table_name}.*, read_marks.id AS read_mark_id",
-          :joins => "LEFT JOIN read_marks ON read_marks.readable_type  = '#{self.base_class.name}'
-                                         AND read_marks.readable_id    = #{self.table_name}.id
-                                         AND read_marks.user_id        = #{user.id}
-                                         AND read_marks.timestamp     >= #{self.table_name}.#{readable_options[:on]}" }
+
+      scope :with_read_marks_for, lambda { |user|
+        join_read_marks(user).select("#{self.table_name}.*, read_marks.id AS read_mark_id")
       }
+
       extend ReadableClassMethods
       include ReadableInstanceMethods
     end

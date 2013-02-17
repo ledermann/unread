@@ -1,3 +1,8 @@
+0.2.0 - WIP
+
+* Support for Rails 2 dropped
+* Refactoring
+
 0.1.2 - 2013/01/27
 
 * Scopes: Improved parameter check
