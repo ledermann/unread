@@ -165,9 +165,7 @@ module Unread
     end
 
     def assert_reader_class
-      unless ReadMark.reader_class
-        raise RuntimeError, 'There is no class using acts_as_reader!'
-      end
+      raise RuntimeError, 'There is no class using acts_as_reader!' unless ReadMark.reader_class
     end
   end
 
