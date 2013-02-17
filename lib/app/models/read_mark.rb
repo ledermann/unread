@@ -6,9 +6,7 @@ class ReadMark < ActiveRecord::Base
 
   scope :global, where(:readable_id => nil)
   scope :single, where('readable_id IS NOT NULL')
-  scope :readable_type, lambda { |readable_type | where(:readable_type => readable_type) }
-  scope :user,          lambda { |user|           where(:user_id => user.id) }
-  scope :older_than,    lambda { |timestamp|      where([ 'timestamp < ?', timestamp]) }
+  scope :older_than, lambda { |timestamp| where([ 'timestamp < ?', timestamp]) }
 
   # Returns the class defined by ActsAsReadable::acts_as_reader
   def self.reader_class

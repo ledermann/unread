@@ -77,7 +77,7 @@ module Unread
         array.each do |obj|
           raise ArgumentError unless obj.is_a?(self)
 
-          rm = ReadMark.user(user).readable_type(self.base_class.name).find_by_readable_id(obj.id) ||
+          rm = ReadMark.where(:user_id => user.id, :readable_type => self.base_class.name).find_by_readable_id(obj.id) ||
                user.read_marks.build(:readable_id => obj.id, :readable_type => self.base_class.name)
           rm.timestamp = obj.send(readable_options[:on])
           rm.save!
@@ -114,7 +114,7 @@ module Unread
 
           if oldest_timestamp
             # Delete markers OLDER than this timestamp and move the global timestamp for this user
-            user.read_marks.readable_type(self.base_class.name).single.older_than(oldest_timestamp).delete_all
+            user.read_marks.single.where(:readable_type => self.base_class.name).older_than(oldest_timestamp).delete_all
             set_read_mark(user, oldest_timestamp - 1.second)
           else
             # There is no unread item, so mark all as read (which deletes all markers)
@@ -198,7 +198,7 @@ module Unread
     end
 
     def read_mark(user)
-      read_marks.user(user).first
+      read_marks.where(:user_id => user.id).first
     end
   end
 
@@ -206,7 +206,7 @@ module Unread
     def read_mark_global(klass)
       instance_var_name = "@read_mark_global_#{klass.name.gsub('::','_')}"
       instance_variable_get(instance_var_name) || begin # memoize
-        obj = self.read_marks.readable_type(klass.base_class.name).global.first
+        obj = self.read_marks.where(:readable_type => klass.base_class.name).global.first
         instance_variable_set(instance_var_name, obj)
       end
     end
