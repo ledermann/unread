@@ -80,8 +80,7 @@ module Unread
         array.each do |obj|
           raise ArgumentError unless obj.is_a?(self)
 
-          rm = ReadMark.where(:user_id => user.id, :readable_type => self.base_class.name).find_by_readable_id(obj.id) ||
-               user.read_marks.build(:readable_id => obj.id, :readable_type => self.base_class.name)
+          rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build(:user_id => user.id)
           rm.timestamp = obj.send(readable_options[:on])
           rm.save!
         end
