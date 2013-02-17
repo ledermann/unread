@@ -60,23 +60,27 @@ module Unread
 
   module ReadableClassMethods
     def mark_as_read!(target, options)
-      raise ArgumentError unless target == :all || target.is_a?(Array)
-
       user = options[:for]
       assert_reader(user)
 
       if target == :all
         reset_read_marks!(user)
       elsif target.is_a?(Array)
-        ReadMark.transaction do
-          target.each do |obj|
-            raise ArgumentError unless obj.is_a?(self)
+        mark_array_as_read(target, user)
+      else
+        raise ArgumentError
+      end
+    end
 
-            rm = ReadMark.user(user).readable_type(self.base_class.name).find_by_readable_id(obj.id) ||
-                 user.read_marks.build(:readable_id => obj.id, :readable_type => self.base_class.name)
-            rm.timestamp = obj.send(readable_options[:on])
-            rm.save!
-          end
+    def mark_array_as_read(array, user)
+      ReadMark.transaction do
+        array.each do |obj|
+          raise ArgumentError unless obj.is_a?(self)
+
+          rm = ReadMark.user(user).readable_type(self.base_class.name).find_by_readable_id(obj.id) ||
+               user.read_marks.build(:readable_id => obj.id, :readable_type => self.base_class.name)
+          rm.timestamp = obj.send(readable_options[:on])
+          rm.save!
         end
       end
     end
