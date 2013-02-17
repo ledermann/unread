@@ -120,24 +120,34 @@ module Unread
       end
     end
 
-    def reset_read_marks!(user = :all)
+    def reset_read_marks!(user=nil)
       assert_reader_class
 
-      ReadMark.transaction do
-        if user == :all
-          ReadMark.delete_all :readable_type => self.base_class.name
-
-          ReadMark.connection.execute("
-            INSERT INTO read_marks (user_id, readable_type, timestamp)
-            SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
-            FROM #{ReadMark.reader_class.table_name}
-          ")
-        else
-          ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
-          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
-        end
+      if user
+        reset_read_marks_for_user(user)
+      else
+        reset_read_marks_for_all_users
       end
-      true
+    end
+
+    def reset_read_marks_for_all_users
+      ReadMark.transaction do
+        ReadMark.delete_all :readable_type => self.base_class.name
+        ReadMark.connection.execute <<-EOT
+          INSERT INTO read_marks (user_id, readable_type, timestamp)
+          SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
+          FROM #{ReadMark.reader_class.table_name}
+        EOT
+      end
+    end
+
+    def reset_read_marks_for_user(user)
+      assert_reader(user)
+
+      ReadMark.transaction do
+        ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
+        ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
+      end
     end
 
     def assert_reader(user)
