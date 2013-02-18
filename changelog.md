@@ -2,6 +2,7 @@
 
 * Support for Rails 2 dropped
 * Refactoring
+* Added migration generator
 
 0.1.2 - 2013/01/27
 
