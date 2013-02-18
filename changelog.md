@@ -1,4 +1,4 @@
-0.2.0 - WIP
+0.2.0 - 2013/02/18
 
 * Support for Rails 2 dropped
 * Refactoring
