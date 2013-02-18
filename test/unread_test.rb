@@ -152,7 +152,7 @@ class UnreadTest < ActiveSupport::TestCase
   end
 
   def test_reset_read_marks_for_all
-    Email.reset_read_marks!
+    Email.reset_read_marks_for_all
 
     assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count

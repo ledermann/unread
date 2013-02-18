@@ -67,7 +67,7 @@ module Unread
       assert_reader(user)
 
       if target == :all
-        reset_read_marks!(user)
+        reset_read_marks_for_user(user)
       elsif target.is_a?(Array)
         mark_array_as_read(target, user)
       else
@@ -85,12 +85,6 @@ module Unread
           rm.save!
         end
       end
-    end
-
-    def set_read_mark(user, timestamp)
-      rm = user.read_mark_global(self) || user.read_marks.build(:readable_type => self.base_class.name)
-      rm.timestamp = timestamp
-      rm.save!
     end
 
     # A scope with all items accessable for the given user
@@ -111,32 +105,29 @@ module Unread
 
       ReadMark.reader_class.find_each do |user|
         ReadMark.transaction do
-          # Get the timestamp of the oldest unread item the user has access to
-          oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
-
-          if oldest_timestamp
-            # Delete markers OLDER than this timestamp and move the global timestamp for this user
-            user.read_marks.single.where(:readable_type => self.base_class.name).older_than(oldest_timestamp).delete_all
-            set_read_mark(user, oldest_timestamp - 1.second)
+          if oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
+            # There are unread items, so update the global read_mark for this user to the oldest
+            # unread item and delete older read_marks
+            update_read_marks_for_user(user, oldest_timestamp)
           else
-            # There is no unread item, so mark all as read (which deletes all markers)
-            mark_as_read!(:all, :for => user)
+            # There is no unread item, so deletes all markers and move global timestamp
+            reset_read_marks_for_user(user)
           end
         end
       end
     end
 
-    def reset_read_marks!(user=nil)
-      assert_reader_class
+    def update_read_marks_for_user(user, timestamp)
+      # Delete markers OLDER than the given timestamp
+      user.read_marks.where(:readable_type => self.base_class.name).single.older_than(timestamp).delete_all
 
-      if user
-        reset_read_marks_for_user(user)
-      else
-        reset_read_marks_for_all_users
-      end
+      # Change the global timestamp for this user
+      rm = user.read_mark_global(self) || user.read_marks.build(:readable_type => self.base_class.name)
+      rm.timestamp = timestamp - 1.second
+      rm.save!
     end
 
-    def reset_read_marks_for_all_users
+    def reset_read_marks_for_all
       ReadMark.transaction do
         ReadMark.delete_all :readable_type => self.base_class.name
         ReadMark.connection.execute <<-EOT
