@@ -2,6 +2,7 @@ language: ruby
 rvm:
   - 1.8.7
   - 1.9.3
+  - 2.0.0
 gemfile:
   - ci/Gemfile.rails-3.0.x
   - ci/Gemfile.rails-3.1.x
@@ -11,3 +12,6 @@ env:
   - DB=mysql
 before_script:
   - "mysql -e 'create database myapp_test;' >/dev/null"
+matrix:
+  allow_failures:
+    - rvm: 2.0.0
