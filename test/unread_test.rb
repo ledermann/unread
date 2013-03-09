@@ -160,6 +160,6 @@ class UnreadTest < ActiveSupport::TestCase
 
 private
   def wait
-    Timecop.travel(1.minute)
+    Timecop.freeze(1.minute.from_now)
   end
 end
