@@ -12,6 +12,3 @@ env:
   - DB=mysql
 before_script:
   - "mysql -e 'create database myapp_test;' >/dev/null"
-matrix:
-  allow_failures:
-    - rvm: 2.0.0
