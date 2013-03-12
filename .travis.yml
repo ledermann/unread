@@ -14,10 +14,8 @@ env:
 before_script:
   - "mysql -e 'create database myapp_test;' >/dev/null"
 matrix:
-  allow_failures:
+  exclude:
     - rvm: 1.8.7
       gemfile: ci/Gemfile.rails-4.0.x
-    - rvm: 1.9.3
-      gemfile: ci/Gemfile.rails-4.0.x
-    - rvm: 2.0.0
-      gemfile: ci/Gemfile.rails-4.0.x
+  allow_failures:
+    - gemfile: ci/Gemfile.rails-4.0.x
