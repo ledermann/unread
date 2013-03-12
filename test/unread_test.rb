@@ -124,10 +124,9 @@ class UnreadTest < ActiveSupport::TestCase
   end
 
   def test_mark_all_as_read
-    Timecop.freeze
     Email.mark_as_read! :all, :for => @reader
-    assert_equal Time.current, @reader.read_mark_global(Email).timestamp
 
+    assert_equal Time.current.utc, @reader.read_mark_global(Email).timestamp.utc
     assert_equal [], @reader.read_marks.single
     assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
