@@ -14,6 +14,7 @@ class UnreadTest < ActiveSupport::TestCase
     Reader.delete_all
     Email.delete_all
     ReadMark.delete_all
+    Timecop.return
   end
 
   def test_schema_has_loaded_correctly
@@ -123,6 +124,7 @@ class UnreadTest < ActiveSupport::TestCase
   end
 
   def test_mark_all_as_read
+    Timecop.freeze
     Email.mark_as_read! :all, :for => @reader
     assert_equal Time.current, @reader.read_mark_global(Email).timestamp
 
