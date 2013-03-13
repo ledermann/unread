@@ -18,7 +18,7 @@ class UnreadTest < ActiveSupport::TestCase
   end
 
   def test_schema_has_loaded_correctly
-    assert_equal [@email1, @email2], Email.all.to_a
+    assert_equal [@email1, @email2], Email.all
   end
 
   def test_readable_classes
@@ -126,7 +126,7 @@ class UnreadTest < ActiveSupport::TestCase
   def test_mark_all_as_read
     Email.mark_as_read! :all, :for => @reader
 
-    assert_equal Time.current.utc, @reader.read_mark_global(Email).timestamp.utc
+    assert_equal Time.now.utc, @reader.read_mark_global(Email).timestamp.utc
     assert_equal [], @reader.read_marks.single
     assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
