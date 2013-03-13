@@ -1,3 +1,9 @@
+# Changelog
+
+0.3.0 - WIP
+
+* Support for Rails 4 (beta1)
+
 0.2.0 - 2013/02/18
 
 * Support for Rails 2 dropped
