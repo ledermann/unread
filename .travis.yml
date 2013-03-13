@@ -12,5 +12,3 @@ matrix:
   exclude:
     - rvm: 1.8.7
       gemfile: ci/Gemfile.rails-4.0.x
-  allow_failures:
-    - gemfile: ci/Gemfile.rails-4.0.x
