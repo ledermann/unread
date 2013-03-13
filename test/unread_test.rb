@@ -14,6 +14,7 @@ class UnreadTest < ActiveSupport::TestCase
     Reader.delete_all
     Email.delete_all
     ReadMark.delete_all
+    Timecop.return
   end
 
   def test_schema_has_loaded_correctly
@@ -39,7 +40,7 @@ class UnreadTest < ActiveSupport::TestCase
   def test_with_read_marks_for
     @email1.mark_as_read! :for => @reader
 
-    emails = Email.with_read_marks_for(@reader).all
+    emails = Email.with_read_marks_for(@reader).to_a
 
     assert emails[0].read_mark_id.present?
     assert emails[1].read_mark_id.nil?
@@ -124,8 +125,8 @@ class UnreadTest < ActiveSupport::TestCase
 
   def test_mark_all_as_read
     Email.mark_as_read! :all, :for => @reader
-    assert_equal Time.now.to_s, @reader.read_mark_global(Email).try(:timestamp).to_s
 
+    assert_equal Time.now.utc, @reader.read_mark_global(Email).timestamp.utc
     assert_equal [], @reader.read_marks.single
     assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
@@ -148,7 +149,7 @@ class UnreadTest < ActiveSupport::TestCase
   def test_cleanup_read_marks_not_delete_from_other_readables
     other_read_mark = @reader.read_marks.create! :readable_type => 'Foo', :readable_id => 42, :timestamp => 5.years.ago
     Email.cleanup_read_marks!
-    assert_equal true, ReadMark.exists?(other_read_mark.id)
+    assert_equal true, !!ReadMark.exists?(other_read_mark.id) # Rails4 does not return true, but count instead.
   end
 
   def test_reset_read_marks_for_all
@@ -160,6 +161,6 @@ class UnreadTest < ActiveSupport::TestCase
 
 private
   def wait
-    Timecop.freeze(1.minute.from_now)
+    Timecop.freeze(1.minute.from_now.change(:usec => 0))
   end
 end
