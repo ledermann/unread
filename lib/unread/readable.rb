@@ -3,10 +3,11 @@ module Unread
     module ClassMethods
       def mark_as_read!(target, options)
         user = options[:for]
+        time = options[:last_read_at]
         assert_reader(user)
 
         if target == :all
-          reset_read_marks_for_user(user)
+          reset_read_marks_for_user(user, time)
         elsif target.is_a?(Array)
           mark_array_as_read(target, user)
         else
@@ -77,12 +78,12 @@ module Unread
         end
       end
 
-      def reset_read_marks_for_user(user)
+      def reset_read_marks_for_user(user, time = Time.now)
         assert_reader(user)
 
         ReadMark.transaction do
           ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
-          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
+          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => time
         end
       end
 
