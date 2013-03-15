@@ -3,7 +3,7 @@ module Unread
     module ClassMethods
       def mark_as_read!(target, options)
         user = options[:for]
-        time = options[:last_read_at]
+        time = options[:last_read_at] || Time.now
         assert_reader(user)
 
         if target == :all
