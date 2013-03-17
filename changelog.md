@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 - WIP
+## 0.3.0 - 2013/03/17
 
 * Support for Rails 4 (beta1)
 
