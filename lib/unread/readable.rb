@@ -71,7 +71,7 @@ module Unread
           ReadMark.delete_all :readable_type => self.base_class.name
           ReadMark.connection.execute <<-EOT
             INSERT INTO read_marks (user_id, readable_type, timestamp)
-            SELECT id, '#{self.base_class.name}', '#{Time.now.to_s(:db)}'
+            SELECT id, '#{self.base_class.name}', '#{Time.current.utc.to_s(:db)}'
             FROM #{ReadMark.reader_class.table_name}
           EOT
         end
@@ -82,7 +82,7 @@ module Unread
 
         ReadMark.transaction do
           ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
-          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.now
+          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.current.utc
         end
       end
 

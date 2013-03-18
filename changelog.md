@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 - WIP
+
+* Fixed timestamps to always use UTC. Issue #18 (thanks to @henrythe9th)
+
 ## 0.3.0 - 2013/03/17
 
 * Support for Rails 4 (beta1)
