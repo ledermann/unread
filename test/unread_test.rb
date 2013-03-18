@@ -131,6 +131,15 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal 0, ReadMark.single.count
     assert_equal 2, ReadMark.global.count
   end
+  
+  def test_mark_all_as_read_with_last_read_at
+    Email.mark_as_read! :all, :for => @reader, :last_read_at => 1.minute.ago.change(:usec => 0)
+
+    assert_equal 1.minute.ago.change(:usec => 0), @reader.read_mark_global(Email).timestamp.utc
+    assert_equal [@email2], Email.unread_by(@reader)
+    assert_equal 0, ReadMark.single.count
+    assert_equal 2, ReadMark.global.count
+  end
 
   def test_cleanup_read_marks
     assert_equal 0, @reader.read_marks.single.count
