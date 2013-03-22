@@ -2,7 +2,7 @@
 
 ## 0.3.1 - WIP
 
-* Use Time.current instead of Time.now for timestamps. Issue #18 (thanks to @henrythe9th)
+* Use Time.current instead of Time.now to avoid time zone trouble. Issue #18 (thanks to @henrythe9th)
 
 
 ## 0.3.0 - 2013-03-17
