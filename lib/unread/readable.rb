@@ -114,6 +114,14 @@ module Unread
         end
       end
 
+      def unread_by_scope?
+        if self.attributes['is_unread'].present?
+          self.is_unread == 1
+        else
+          false
+        end
+      end
+
       def mark_as_read!(options)
         user = options[:for]
         self.class.assert_reader(user)

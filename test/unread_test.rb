@@ -49,6 +49,21 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal true, emails[1].unread?(@reader)
   end
 
+  def test_with_is_unread_for
+    @email1.mark_as_read! :for => @reader
+
+    emails = Email.with_is_unread_for(@reader).to_a
+
+    assert emails[0].is_unread.present?
+    assert emails[1].is_unread.present?
+
+    assert_equal 0, emails[0].is_unread
+    assert_equal 1, emails[1].is_unread
+
+    assert_equal false, emails[0].unread_by_scope?
+    assert_equal true, emails[1].unread_by_scope?
+  end
+
   def test_scope_param_check
     [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
       assert_raise(ArgumentError) { Email.unread_by(not_a_reader)}
