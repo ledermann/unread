@@ -24,6 +24,10 @@ module Unread
       def with_read_marks_for(user)
         join_read_marks(user).select("#{table_name}.*, read_marks.id AS read_mark_id")
       end
+
+      def with_is_unread_for(user)
+        join_read_marks(user).select("#{table_name}.*, (CASE WHEN (read_marks.id IS NULL OR " + "#{table_name}.#{readable_options[:on]} > read_marks.timestamp" +  ") THEN 1 ELSE 0 END) AS is_unread")
+      end
     end
   end
 end
