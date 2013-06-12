@@ -127,6 +127,13 @@ module Unread
         end
       end
 
+      def mark_as_unread!(options)
+        user = options[:for]
+        self.class.assert_reader(user)
+
+        user.read_marks.where(:readable_id => self.id).single.delete_all
+      end      
+
       def read_mark(user)
         read_marks.where(:user_id => user.id).first
       end
