@@ -3,6 +3,7 @@
 ## 0.3.1 - 2013-12-04
 
 * Use Time.current instead of Time.now to avoid time zone trouble. Issue #18 (thanks to @henrythe9th)
+* Improve caching for read_mark_global. Issue #22 (thanks to @simpl1g)
 * Handle primary keys other than "id". Issue #29 (thanks to @bcavileer)
 
 
