@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.1 - WIP
+## 0.3.1 - 2013-12-04
 
 * Use Time.current instead of Time.now to avoid time zone trouble. Issue #18 (thanks to @henrythe9th)
 * Handle primary keys other than "id". Issue #29 (thanks to @bcavileer)
