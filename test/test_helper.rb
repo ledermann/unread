@@ -14,10 +14,13 @@ load(File.dirname(__FILE__) + "/schema.rb")
 require 'unread'
 
 class Reader < ActiveRecord::Base
+  self.primary_key = 'number'
   acts_as_reader
 end
 
 class Email < ActiveRecord::Base
+  self.primary_key = 'messageid'
+
   acts_as_readable :on => :updated_at
 end
 

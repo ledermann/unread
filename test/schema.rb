@@ -1,9 +1,9 @@
 ActiveRecord::Schema.define(:version => 0) do
-  create_table :readers, :force => true do |t|
+  create_table :readers, :primary_key => 'number', :force => true do |t|
     t.string :name
   end
 
-  create_table :emails, :force => true do |t|
+  create_table :emails, :primary_key => 'messageid', :force => true do |t|
     t.string :subject
     t.text :content
     t.datetime :created_at

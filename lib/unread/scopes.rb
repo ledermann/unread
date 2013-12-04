@@ -5,7 +5,7 @@ module Unread
         assert_reader(user)
 
         joins "LEFT JOIN read_marks ON read_marks.readable_type  = '#{base_class.name}'
-                                   AND read_marks.readable_id    = #{table_name}.id
+                                   AND read_marks.readable_id    = #{table_name}.#{primary_key}
                                    AND read_marks.user_id        = #{user.id}
                                    AND read_marks.timestamp     >= #{table_name}.#{readable_options[:on]}"
       end
