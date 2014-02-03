@@ -114,7 +114,7 @@ module Unread
         # was most likely eager_loaded as part of
         # with_read_marks_eager_loaded_for which also adds the timestamp clause
         # necessary for this logic to be accurate.
-        elsif self.read_marks.loaded? && self.table_name != 'read_marks'
+        elsif self.read_marks.loaded? && self.class.table_name != 'read_marks'
           self.read_marks.length == 0
         else
           !!self.class.unread_by(user).exists?(self) # Rails4 does not return true/false, but nil/count instead.

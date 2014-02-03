@@ -49,6 +49,23 @@ class UnreadTest < ActiveSupport::TestCase
     assert_equal true, emails[1].unread?(@reader)
   end
 
+  def test_with_read_marks_eager_loaded_for
+    @email1.mark_as_read! :for => @reader
+
+    emails = Email.with_read_marks_eager_loaded_for(@reader).to_a
+
+    # Make sure this isn't using custom fields like with_read_marks_for, so it
+    # will work with other eager_loads.
+    assert !emails[0].respond_to?(:read_mark_id)
+
+    assert emails[0].read_marks.loaded?
+    assert emails[0].read_marks.count == 1
+    assert emails[1].read_marks.count == 0
+
+    assert_equal false, emails[0].unread?(@reader)
+    assert_equal true, emails[1].unread?(@reader)
+  end
+
   def test_scope_param_check
     [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
       assert_raise(ArgumentError) { Email.unread_by(not_a_reader)}

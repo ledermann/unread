@@ -29,7 +29,7 @@ module Unread
       def with_read_marks_eager_loaded_for(user)
         eager_load(:read_marks)
           .where("read_marks.user_id = #{user.id} OR read_marks.user_id IS NULL")
-          .where("`read_marks`.`timestamp` >= `#{self.table_name}`.`created_at` OR read_marks.user_id IS NULL")
+          .where("read_marks.timestamp >= #{table_name}.#{readable_options[:on]} OR read_marks.user_id IS NULL")
       end
     end
   end
