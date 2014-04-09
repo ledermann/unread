@@ -1,13 +1,12 @@
-require 'test/unit'
-require 'active_support'
-require 'active_support/test_case'
+require 'minitest/autorun'
+require 'yaml'
 require 'active_record'
 require 'timecop'
 
 configs = YAML.load_file(File.dirname(__FILE__) + '/database.yml')
 ActiveRecord::Base.configurations = configs
 
-ActiveRecord::Base.establish_connection('sqlite')
+ActiveRecord::Base.establish_connection(:sqlite)
 ActiveRecord::Migration.verbose = false
 load(File.dirname(__FILE__) + "/schema.rb")
 
