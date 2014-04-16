@@ -109,6 +109,13 @@ module Unread
           else
             true
           end
+        # If read_marks has been eager_loaded, use that value, as long as the
+        # base table for this query is not read_marks. This means read_marks
+        # was most likely eager_loaded as part of
+        # with_read_marks_loaded_for which also adds the timestamp clause
+        # necessary for this logic to be accurate.
+        elsif self.read_marks_eager.loaded? && self.class.table_name != 'read_marks'
+          self.read_marks_eager.length == 0
         else
           !!self.class.unread_by(user).exists?(self) # Rails4 does not return true/false, but nil/count instead.
         end

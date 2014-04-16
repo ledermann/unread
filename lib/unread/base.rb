@@ -29,6 +29,18 @@ module Unread
 
       has_many :read_marks, :as => :readable, :dependent => :delete_all
 
+      # Store for use in eager loaded conditions
+      readable_table_name = table_name
+      readable_class = base_class
+      # Used for eager loading
+      has_many :read_marks_eager,
+        -> {
+          where("#{table_name}.timestamp >= #{readable_table_name}.#{options[:on]}").
+            where "#{table_name}.readable_type = '#{readable_class.name}'"
+        },
+        :foreign_key => 'readable_id',
+        :class_name => "ReadMark"
+
       ReadMark.readable_classes ||= []
       ReadMark.readable_classes << self unless ReadMark.readable_classes.include?(self)
 

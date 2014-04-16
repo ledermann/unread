@@ -85,6 +85,20 @@ Message.unread_by(current_user)
 Message.cleanup_read_marks!
 ```
 
+### Using in conjunction with eager loading
+To preload read / unread status in a "query" that uses eager loading,
+_with_read_marks_for_ will not work. Instead, use _with_read_marks_eager_loaded_for_.
+
+```ruby
+class Message < ActiveRecord::Base
+  acts_as_readable :on => :created_at
+  has_many :users
+end
+
+## Get all messages with users eager loaded and including the read status for a given user
+messages = Message.eager_load(:users).with_read_marks_eager_loaded_for(current_user)
+```
+
 
 ## How does it work?
 
