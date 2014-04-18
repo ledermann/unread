@@ -23,6 +23,11 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 * Needs a timestamp field in your models (like created_at or updated_at) with a database index on it
 
 
+## Changelog
+
+https://github.com/ledermann/unread/releases
+
+
 ## Installation
 
 Step 1: Add this to your Gemfile:
