@@ -138,4 +138,4 @@ There are two other gems/plugins doing a similar job:
 Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a `find(:all)`, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
-Copyright (c) 2010-2013 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
+Copyright (c) 2010-2014 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
