@@ -81,7 +81,7 @@ describe Unread::Readable do
     end
   end
 
-  describe :mark_as_read! do
+  describe '#mark_as_read!' do
     it "should mark a single object as read" do
       @email1.mark_as_read! :for => @reader
 
@@ -101,7 +101,9 @@ describe Unread::Readable do
 
       @reader.read_marks.single.count.should eq 1
     end
+  end
 
+  describe '.mark_as_read!' do
     it "should mark multi objects as read" do
       @email1.unread?(@reader).should be_true
       @email2.unread?(@reader).should be_true
@@ -129,6 +131,16 @@ describe Unread::Readable do
 
       @reader.read_marks.single.should eq []
     end
+
+    it "should not allow invalid arguments" do
+      expect {
+        Email.mark_as_read! :foo, :for => @reader
+      }.to raise_error(ArgumentError)
+
+      expect {
+        Email.mark_as_read! :foo, :bar
+      }.to raise_error(ArgumentError)
+    end
   end
 
   describe :reset_read_marks_for_all do
@@ -141,7 +153,7 @@ describe Unread::Readable do
   end
 
   describe :cleanup_read_marks! do
-    it "test_cleanup_read_marks" do
+    it "should delete all single read marks" do
       @reader.read_marks.single.count.should eq 0
 
       @email1.mark_as_read! :for => @reader
@@ -155,7 +167,18 @@ describe Unread::Readable do
       @reader.read_marks.single.count.should eq 0
     end
 
-    it "test_cleanup_read_marks_not_delete_from_other_readables" do
+    it "should reset if all objects are read" do
+      @email1.mark_as_read! :for => @reader
+      @email2.mark_as_read! :for => @reader
+
+      @reader.read_marks.single.count.should eq 2
+
+      Email.cleanup_read_marks!
+
+      @reader.read_marks.single.count.should eq 0
+    end
+
+    it "should not delete read marks from other readables" do
       other_read_mark = @reader.read_marks.create! :readable_type => 'Foo', :readable_id => 42, :timestamp => 5.years.ago
       Email.cleanup_read_marks!
 

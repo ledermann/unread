@@ -2,6 +2,8 @@ module Unread
   module Readable
     module ClassMethods
       def mark_as_read!(target, options)
+        raise ArgumentError unless options.is_a?(Hash)
+
         user = options[:for]
         assert_reader(user)
 
