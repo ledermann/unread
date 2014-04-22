@@ -52,7 +52,10 @@ def setup_db
   ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
   ActiveRecord::Migration.verbose = false
 
-  ActiveRecord::Schema.define(:version => 0) do
+  require File.expand_path('../../lib/generators/unread/migration/templates/migration.rb', __FILE__)
+  UnreadMigration.new.migrate(:up)
+
+  ActiveRecord::Schema.define(:version => 1) do
     create_table :readers, :primary_key => 'number', :force => true do |t|
       t.string :name
     end
@@ -63,15 +66,6 @@ def setup_db
       t.datetime :created_at
       t.datetime :updated_at
     end
-
-    create_table :read_marks, :force => true do |t|
-      t.integer  :readable_id
-      t.integer  :user_id,       :null => false
-      t.string   :readable_type, :null => false
-      t.datetime :timestamp
-    end
-
-    add_index :read_marks, [ :user_id, :readable_type, :readable_id ]
   end
 end
 
