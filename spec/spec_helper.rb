@@ -53,7 +53,7 @@ def setup_db
   ActiveRecord::Migration.verbose = false
 
   require File.expand_path('../../lib/generators/unread/migration/templates/migration.rb', __FILE__)
-  UnreadMigration.new.migrate(:up)
+  UnreadMigration.migrate(:up)
 
   ActiveRecord::Schema.define(:version => 1) do
     create_table :readers, :primary_key => 'number', :force => true do |t|
