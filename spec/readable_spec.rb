@@ -41,6 +41,14 @@ describe Unread::Readable do
   end
 
   describe :with_read_marks_for do
+    it "should return readables" do
+      Email.with_read_marks_for(@reader).to_a.should == [@email1, @email2]
+    end
+
+    it "should be countable" do
+      Email.with_read_marks_for(@reader).count(:messageid).should == 2
+    end
+
     it "should not allow invalid parameter" do
       [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
         expect {
