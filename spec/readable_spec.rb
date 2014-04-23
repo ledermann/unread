@@ -28,10 +28,6 @@ describe Unread::Readable do
         expect {
           Email.unread_by(not_a_reader)
         }.to raise_error(ArgumentError)
-
-        expect {
-          Email.with_read_marks_for(not_a_reader)
-        }.to raise_error(ArgumentError)
       end
     end
 
@@ -41,6 +37,20 @@ describe Unread::Readable do
       expect {
         Email.unread_by(unsaved_reader)
       }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe :with_read_marks_for do
+    it "should not allow invalid parameter" do
+      [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+        expect {
+          Email.with_read_marks_for(not_a_reader)
+        }.to raise_error(ArgumentError)
+      end
+    end
+
+    it "should not allow unsaved reader" do
+      unsaved_reader = Reader.new
 
       expect {
         Email.with_read_marks_for(unsaved_reader)
