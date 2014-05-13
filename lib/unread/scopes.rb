@@ -14,7 +14,7 @@ module Unread
         result = join_read_marks(user).
                  where('read_marks.id IS NULL')
 
-        if global_time_stamp = user.read_mark_global(self).try(:timestamp)
+        if global_time_stamp = user.read_mark_global(self.base_class).try(:timestamp)
           result = result.where("#{table_name}.#{readable_options[:on]} > '#{global_time_stamp.to_s(:db)}'")
         end
 
