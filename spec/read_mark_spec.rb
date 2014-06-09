@@ -2,6 +2,6 @@ require 'spec_helper'
 
 describe ReadMark do
   it "should have reader_class" do
-    ReadMark.reader_class.should eq Reader
+    expect(ReadMark.reader_class).to eq Reader
   end
 end
