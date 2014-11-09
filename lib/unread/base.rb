@@ -18,6 +18,8 @@ module Unread
         end
       end
 
+      ReadMark.reader_class = self
+
       include Reader::InstanceMethods
     end
 
