@@ -4,7 +4,7 @@ module Unread
   end
 
   module Base
-    def acts_as_reader
+    def acts_as_reader(options={})
       ReadMark.belongs_to :user, :class_name => self.to_s
 
       has_many :read_marks, :dependent => :delete_all, :foreign_key => 'user_id', :inverse_of => :user
@@ -19,6 +19,7 @@ module Unread
       end
 
       ReadMark.reader_class = self
+      ReadMark.reader_options = options
 
       include Reader::InstanceMethods
     end

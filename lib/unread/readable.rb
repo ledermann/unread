@@ -44,7 +44,7 @@ module Unread
       def cleanup_read_marks!
         assert_reader_class
 
-        ReadMark.reader_class.find_each do |user|
+        ReadMark.reader_scope.find_each do |user|
           ReadMark.transaction do
             if oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
               # There are unread items, so update the global read_mark for this user to the oldest
