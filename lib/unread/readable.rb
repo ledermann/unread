@@ -18,12 +18,19 @@ module Unread
 
       def mark_array_as_read(array, user)
         ReadMark.transaction do
+          global_timestamp = user.read_mark_global(self).try(:timestamp)
+
           array.each do |obj|
             raise ArgumentError unless obj.is_a?(self)
+            timestamp = obj.send(readable_options[:on])
 
-            rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build(:user_id => user.id)
-            rm.timestamp = obj.send(readable_options[:on])
-            rm.save!
+            if global_timestamp && global_timestamp >= timestamp
+              # The object is implicitly marked as read, so there is nothing to do
+            else
+              rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build(:user_id => user.id)
+              rm.timestamp = timestamp
+              rm.save!
+            end
           end
         end
       end

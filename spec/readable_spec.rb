@@ -132,6 +132,14 @@ describe Unread::Readable do
       expect(@email2.unread?(@reader)).to be_falsey
     end
 
+    it "should perform less queries if the objects are already read" do
+      Email.mark_as_read! :all, :for => @reader
+
+      expect {
+        Email.mark_as_read! [ @email1, @email2 ], :for => @reader
+      }.to perform_queries(1)
+    end
+
     it "should mark all objects as read" do
       Email.mark_as_read! :all, :for => @reader
 
