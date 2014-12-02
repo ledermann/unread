@@ -11,6 +11,7 @@ describe Unread::Base do
     it "should create global read mark" do
       expect(@reader.read_marks.count).to eq 1
       expect(@reader.read_marks.global.count).to eq 1
+      puts Email.join_read_marks(@reader).where('read_marks.id IS NULL')
     end
 
     it "should define association for ReadMark" do
