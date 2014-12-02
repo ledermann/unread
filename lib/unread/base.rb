@@ -19,6 +19,8 @@ module Unread
       end
 
       include Reader::InstanceMethods
+      extend Reader::ClassMethods
+      extend Reader::Scopes
     end
 
     def acts_as_readable(options={})

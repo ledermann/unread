@@ -21,6 +21,8 @@ describe Unread::Readable do
 
       expect(Email.unread_by(@reader)).to eq [@email2]
       expect(Email.unread_by(@reader).count).to eq 1
+
+      expect(Email.unread_by(@other_reader)).to eq [@email1, @email2]
     end
 
     it "should not allow invalid parameter" do
@@ -51,12 +53,16 @@ describe Unread::Readable do
 
       expect(Email.read_by(@reader)).to eq [@email1]
       expect(Email.read_by(@reader).count).to eq 1
+
+      expect(Email.read_by(@other_reader)).to be_empty
     end
 
     it "should return all records when all read" do
       Email.mark_as_read! :all, :for => @reader
 
       expect(Email.read_by(@reader)).to eq [@email1, @email2]
+
+      expect(Email.read_by(@other_reader)).to be_empty
     end
 
     it "should not allow invalid parameter" do

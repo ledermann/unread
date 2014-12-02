@@ -1,5 +1,18 @@
 module Unread
   module Reader
+    module ClassMethods
+      def assert_readable(readable)
+        assert_readable_class
+
+        raise ArgumentError, "Class #{readable.class.name} is not registered by acts_as_readable!" unless ReadMark.readable_classes.include?(readable.class)
+        raise ArgumentError, "The given #{readable.class.name} has no id!" unless readable.id
+      end
+
+      def assert_readable_class
+        raise RuntimeError, 'There is no class using acts_as_readable!' unless ReadMark.readable_classes.try(:any?)
+      end
+    end
+
     module InstanceMethods
       def read_mark_global(klass)
         instance_var_name = "@read_mark_global_#{klass.name.gsub('::','_')}"
