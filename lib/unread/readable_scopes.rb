@@ -4,11 +4,11 @@ module Unread
       def join_read_marks(user)
         assert_reader(user)
 
-        joins "LEFT JOIN #{ReadMark.table_name} as read_marks ON read_marks.readable_type  = '#{base_class.name}'
-                                   AND (read_marks.readable_id    = #{table_name}.#{primary_key}
-                                     OR read_marks.readable_id   IS NULL)
-                                   AND read_marks.user_id        = #{user.id}
-                                   AND read_marks.timestamp     >= #{table_name}.#{readable_options[:on]}"
+        joins "LEFT JOIN #{ReadMark.table_name} as read_marks
+                ON read_marks.readable_type        = '#{base_class.name}'
+               AND read_marks.readable_id          = #{table_name}.#{primary_key}
+               AND read_marks.user_id              = #{user.id}
+               AND read_marks.timestamp            >= #{table_name}.#{readable_options[:on]}"
       end
 
       def unread_by(user)
@@ -37,7 +37,9 @@ module Unread
       end
 
       def with_read_marks_for(user)
-        join_read_marks(user).select("#{table_name}.*, read_marks.id AS read_mark_id")
+        join_read_marks(user).select("#{table_name}.*,
+                                      read_marks.id AS read_mark_id,
+                                      #{user.id} AS read_mark_user_id")
       end
     end
   end

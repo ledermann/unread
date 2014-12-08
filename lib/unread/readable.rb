@@ -102,7 +102,7 @@ module Unread
 
     module InstanceMethods
       def unread?(user)
-        if self.respond_to?(:read_mark_id)
+        if self.respond_to?(:read_mark_id) and read_mark_id_belongs_to?(user)
           # For use with scope "with_read_marks_for"
           return false if self.read_mark_id
 
@@ -132,6 +132,11 @@ module Unread
       def read_mark(user)
         read_marks.where(:user_id => user.id).first
       end
+
+      private
+        def read_mark_id_belongs_to?(user)
+          self.read_mark_user_id == user.id
+        end
     end
   end
 end

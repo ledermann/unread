@@ -23,6 +23,21 @@ module Unread
           instance_variable_set(instance_var_name, obj)
         end
       end
+
+      def have_not_read?(readable)
+        if self.respond_to?(:read_mark_id) and read_mark_id_belongs_to?(readable)
+          # For use with scope "with_read_marks_for"
+          self.read_mark_id.nil?
+        else
+          !!self.class.have_not_read(readable).exists?(self) # Rails4 does not return true/false, but nil/count instead.
+        end
+      end
+
+      private
+        def read_mark_id_belongs_to?(readable)
+          self.read_mark_readable_type == readable.class.name and
+          (self.read_mark_readable_id.nil? or self.read_mark_readable_id == readable.id)
+        end
     end
   end
 end

@@ -87,6 +87,14 @@ describe Unread::Readable do
       expect(Email.with_read_marks_for(@reader).to_a).to eq([@email1, @email2])
     end
 
+    it "should have elements that respond to :read_mark_id" do
+      all_respond_to_read_mark_id = Email.with_read_marks_for(@reader).to_a.all? do |readable|
+        readable.respond_to?(:read_mark_id)
+      end
+
+      expect(all_respond_to_read_mark_id).to be_truthy
+    end
+
     it "should be countable" do
       expect(Email.with_read_marks_for(@reader).count(:messageid)).to eq(2)
     end
@@ -138,6 +146,14 @@ describe Unread::Readable do
         expect(emails[0].unread?(@reader)).to be_falsey
         expect(emails[1].unread?(@reader)).to be_truthy
       }.to perform_queries(1)
+    end
+
+    it "should work with eager-loaded read marks for the correct reader" do
+      @email1.mark_as_read! :for => @reader
+      emails = Email.with_read_marks_for(@reader).to_a
+
+      expect(emails[0].unread?(@reader)).to be_falsey
+      expect(emails[0].unread?(@other_reader)).to be_truthy
     end
   end
 
