@@ -23,8 +23,6 @@ module Unread
           instance_variable_set(instance_var_name, obj)
         end
       end
-
-      alias_method :set_read_mark_global, :read_mark_global
     end
   end
 end
