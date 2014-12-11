@@ -118,24 +118,24 @@ describe Unread::Reader do
     end
   end
 
-  describe :have_not_read? do
-    it "should recognize unread object" do
-      expect(@reader.have_not_read?(@email1)).to be_truthy
-      expect(@reader.have_not_read?(@email2)).to be_truthy
+  describe :have_read? do
+    it "should recognize read objects" do
+      expect(@reader.have_read?(@email1)).to be_falsey
+      expect(@reader.have_read?(@email2)).to be_falsey
     end
 
     it "should handle updating object" do
       @email1.mark_as_read! :for => @reader
       wait
-      expect(@reader.have_not_read?(@email1)).to be_falsey
+      expect(@reader.have_read?(@email1)).to be_truthy
 
       @email1.update_attributes! :subject => 'changed'
-      expect(@reader.have_not_read?(@email1)).to be_truthy
+      expect(@reader.have_read?(@email1)).to be_falsey
     end
 
     it "should raise error for invalid argument" do
       expect {
-        @reader.have_not_read?(42)
+        @reader.have_read?(42)
       }.to raise_error(ArgumentError)
     end
 
@@ -145,8 +145,8 @@ describe Unread::Reader do
       expect {
         readers = Reader.with_read_marks_for(@email1).to_a
 
-        expect(readers[0].have_not_read?(@email1)).to be_falsey
-        expect(readers[1].have_not_read?(@email1)).to be_truthy
+        expect(readers[0].have_read?(@email1)).to be_truthy
+        expect(readers[1].have_read?(@email1)).to be_falsey
       }.to perform_queries(1)
     end
 
@@ -154,8 +154,8 @@ describe Unread::Reader do
       @email1.mark_as_read! :for => @reader
       readers = Reader.with_read_marks_for(@email1).to_a
 
-      expect(readers[0].have_not_read?(@email1)).to be_falsey
-      expect(readers[0].have_not_read?(@email2)).to be_truthy
+      expect(readers[0].have_read?(@email1)).to be_truthy
+      expect(readers[0].have_read?(@email2)).to be_falsey
     end
   end
 end

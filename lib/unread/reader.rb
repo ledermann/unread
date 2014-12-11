@@ -24,12 +24,12 @@ module Unread
         end
       end
 
-      def have_not_read?(readable)
+      def have_read?(readable)
         if self.respond_to?(:read_mark_id) and read_mark_id_belongs_to?(readable)
           # For use with scope "with_read_marks_for"
-          self.read_mark_id.nil?
+          !self.read_mark_id.nil?
         else
-          !!self.class.have_not_read(readable).exists?(self) # Rails4 does not return true/false, but nil/count instead.
+          !self.class.have_not_read(readable).exists?(self) # Rails4 does not return true/false, but nil/count instead.
         end
       end
 

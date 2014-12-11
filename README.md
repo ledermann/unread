@@ -131,10 +131,10 @@ User.have_read(message2)
 ## Get all users including their read status for a given message
 users = User.with_read_marks_for(message1)
 # => [ user1, user2 ]
-users[0].have_not_read?(message1)
-# => false
-users[1].have_not_read?(message2)
+users[0].have_read?(message1)
 # => true
+users[1].have_read?(message2)
+# => false
 
 # Optional: Cleaning up unneeded markers.
 # Do this in a cron job once a day.
