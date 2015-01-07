@@ -112,7 +112,7 @@ module Unread
             true
           end
         else
-          !!self.class.unread_by(user).exists?(self) # Rails4 does not return true/false, but nil/count instead.
+          self.class.unread_by(user).exists?(self.id)
         end
       end
 
