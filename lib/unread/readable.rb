@@ -91,12 +91,12 @@ module Unread
       def assert_reader(user)
         assert_reader_class
 
-        raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader" unless user.is_a?(ReadMark.reader_class)
-        raise ArgumentError, "The given user has no id!" unless user.id
+        raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader." unless user.is_a?(ReadMark.reader_class)
+        raise ArgumentError, "The given user has no id." unless user.id
       end
 
       def assert_reader_class
-        raise RuntimeError, 'There is no class using acts_as_reader' unless ReadMark.reader_class
+        raise RuntimeError, 'There is no class using acts_as_reader.' unless ReadMark.reader_class
       end
     end
 
