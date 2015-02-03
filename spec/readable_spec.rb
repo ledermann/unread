@@ -21,6 +21,8 @@ describe Unread::Readable do
 
       expect(Email.unread_by(@reader)).to eq [@email2]
       expect(Email.unread_by(@reader).count).to eq 1
+
+      expect(Email.unread_by(@other_reader)).to eq [@email1, @email2]
     end
 
     it "should not allow invalid parameter" do
@@ -40,9 +42,57 @@ describe Unread::Readable do
     end
   end
 
+  describe :read_by do
+    it "should return an empty array" do
+      expect(Email.read_by(@reader)).to be_empty
+      expect(Email.read_by(@other_reader)).to be_empty
+    end
+
+    it "should return read records" do
+      @email1.mark_as_read! :for => @reader
+
+      expect(Email.read_by(@reader)).to eq [@email1]
+      expect(Email.read_by(@reader).count).to eq 1
+
+      expect(Email.read_by(@other_reader)).to be_empty
+    end
+
+    it "should return all records when all read" do
+      Email.mark_as_read! :all, :for => @reader
+
+      expect(Email.read_by(@reader)).to eq [@email1, @email2]
+
+      expect(Email.read_by(@other_reader)).to be_empty
+    end
+
+    it "should not allow invalid parameter" do
+      [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+        expect {
+          Email.read_by(not_a_reader)
+        }.to raise_error(ArgumentError)
+      end
+    end
+
+    it "should not allow unsaved reader" do
+      unsaved_reader = Reader.new
+
+      expect {
+        Email.read_by(unsaved_reader)
+      }.to raise_error(ArgumentError)
+    end
+  end
+
   describe :with_read_marks_for do
     it "should return readables" do
       expect(Email.with_read_marks_for(@reader).to_a).to eq([@email1, @email2])
+    end
+
+    it "should have elements that respond to :read_mark_id" do
+      all_respond_to_read_mark_id = Email.with_read_marks_for(@reader).to_a.all? do |readable|
+        readable.respond_to?(:read_mark_id)
+      end
+
+      expect(all_respond_to_read_mark_id).to be_truthy
     end
 
     it "should be countable" do
@@ -96,6 +146,14 @@ describe Unread::Readable do
         expect(emails[0].unread?(@reader)).to be_falsey
         expect(emails[1].unread?(@reader)).to be_truthy
       }.to perform_queries(1)
+    end
+
+    it "should work with eager-loaded read marks for the correct reader" do
+      @email1.mark_as_read! :for => @reader
+      emails = Email.with_read_marks_for(@reader).to_a
+
+      expect(emails[0].unread?(@reader)).to be_falsey
+      expect(emails[0].unread?(@other_reader)).to be_truthy
     end
   end
 
