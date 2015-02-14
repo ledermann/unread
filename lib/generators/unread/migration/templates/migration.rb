@@ -3,7 +3,7 @@ class UnreadMigration < ActiveRecord::Migration
     create_table :read_marks, :force => true do |t|
       t.integer  :readable_id
       t.integer  :user_id,       :null => false
-      t.string   :readable_type, :null => false, :limit => 20
+      t.string   :readable_type, :null => false
       t.datetime :timestamp
     end
 
