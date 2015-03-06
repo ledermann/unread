@@ -1,9 +1,8 @@
 class UnreadMigration < ActiveRecord::Migration
   def self.up
     create_table :read_marks, :force => true do |t|
-      t.integer  :readable_id
+      t.references :readable, polymorphic: { null: false }
       t.integer  :user_id,       :null => false
-      t.string   :readable_type, :null => false
       t.datetime :timestamp
     end
 
