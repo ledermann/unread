@@ -1,6 +1,6 @@
 class ReadMark < ActiveRecord::Base
   belongs_to :readable, :polymorphic => true
-  if ActiveRecord::VERSION::MAJOR < 4
+  if defined?(ProtectedAttributes)
     attr_accessible :readable_id, :user_id, :readable_type, :timestamp
   end
 
