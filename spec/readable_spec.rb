@@ -97,6 +97,14 @@ describe Unread::Readable do
         expect(emails[1].unread?(@reader)).to be_truthy
       }.to perform_queries(1)
     end
+
+    it "should work without any read_marks" do
+      ReadMark.delete_all
+
+      emails = Email.with_read_marks_for(@reader).to_a
+      expect(emails[0].unread?(@reader)).to be_truthy
+      expect(emails[1].unread?(@reader)).to be_truthy
+    end
   end
 
   describe '#mark_as_read!' do

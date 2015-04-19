@@ -40,6 +40,10 @@ RSpec.configure do |config|
   config.after :each do
     Timecop.return
   end
+
+  config.after :suite do
+    UnreadMigration.migrate(:down)
+  end
 end
 
 if I18n.respond_to?(:enforce_available_locales=)
