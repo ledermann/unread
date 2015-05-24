@@ -20,6 +20,13 @@ describe Unread::Base do
     it "should reset read_marks for created reader" do
       expect(Email.unread_by(@reader)).to be_empty
     end
+
+    it "should memoize read_mark_global" do
+      expect {
+        rm1 = @reader.read_mark_global(Email)
+        rm2 = @reader.read_mark_global(Email)
+      }.to perform_queries(1)
+    end
   end
 
   describe :acts_as_readable do

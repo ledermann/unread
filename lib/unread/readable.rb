@@ -93,6 +93,8 @@ module Unread
           ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
           ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.current
         end
+
+        user.forget_memoized_read_mark_global
       end
 
       def assert_reader(user)

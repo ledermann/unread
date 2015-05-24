@@ -166,6 +166,13 @@ describe Unread::Readable do
       expect(@reader.read_marks.single).to eq []
     end
 
+    it "should reset memoized global read mark" do
+      rm_global = @reader.read_mark_global(Email)
+
+      Email.mark_as_read! :all, :for => @reader
+      expect(@reader.read_mark_global(Email)).not_to eq(rm_global)
+    end
+
     it "should not allow invalid arguments" do
       expect {
         Email.mark_as_read! :foo, :for => @reader
