@@ -21,6 +21,8 @@ describe Unread::Readable do
 
       expect(Email.unread_by(@reader)).to eq [@email2]
       expect(Email.unread_by(@reader).count).to eq 1
+
+      expect(Email.unread_by(@other_reader)).to eq [@email1, @email2]
     end
 
     it "should not allow invalid parameter" do
