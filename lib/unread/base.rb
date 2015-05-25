@@ -22,6 +22,8 @@ module Unread
       ReadMark.reader_options = options
 
       include Reader::InstanceMethods
+      extend Reader::ClassMethods
+      extend Reader::Scopes
     end
 
     def acts_as_readable(options={})
