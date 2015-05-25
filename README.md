@@ -74,6 +74,14 @@ message1.mark_as_read! :for => current_user
 Message.unread_by(current_user)
 # => [ message2 ]
 
+## Get read messages for a given user
+Message.read_by(current_user)
+# => [ ]
+
+message1.mark_as_read! :for => current_user
+Message.read_by(current_user)
+# => [ message1 ]
+
 ## Get all messages including the read status for a given user
 messages = Message.with_read_marks_for(current_user)
 # => [ message1, message2 ]
@@ -85,6 +93,9 @@ messages[1].unread?(current_user)
 Message.mark_as_read! :all, :for => current_user
 Message.unread_by(current_user)
 # => [ ]
+
+Message.read_by(current_user)
+# => [ message1, message2 ]
 
 # Optional: Cleaning up unneeded markers.
 # Do this in a cron job once a day.
