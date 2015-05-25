@@ -11,11 +11,24 @@ module Unread
       end
 
       def unread_by(user)
-        result = join_read_marks(user).
-                 where('read_marks.id IS NULL')
+        result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("#{table_name}.#{readable_options[:on]} > ?", global_time_stamp)
+          result = result.where("read_marks.id IS NULL AND #{table_name}.#{readable_options[:on]} > ?", global_time_stamp)
+        else
+          result = result.where('read_marks.id IS NULL')
+        end
+
+        result
+      end
+
+      def read_by(user)
+        result = join_read_marks(user)
+
+        if global_time_stamp = user.read_mark_global(self).try(:timestamp)
+          result = result.where("read_marks.id IS NOT NULL OR #{table_name}.#{readable_options[:on]} <= ?", global_time_stamp)
+        else
+          result = result.where('read_marks.id IS NOT NULL')
         end
 
         result
