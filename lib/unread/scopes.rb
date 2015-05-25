@@ -26,7 +26,7 @@ module Unread
         result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("read_marks.id IS NOT NULL OR #{table_name}.#{readable_options[:on]} <= ?", global_time_stamp).uniq
+          result = result.where("read_marks.id IS NOT NULL OR #{table_name}.#{readable_options[:on]} <= ?", global_time_stamp)
         else
           result = result.where('read_marks.id IS NOT NULL')
         end
