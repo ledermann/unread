@@ -1,8 +1,10 @@
 class ReadMark < ActiveRecord::Base
   belongs_to :readable, :polymorphic => true
+  # :nocov:
   if defined?(ProtectedAttributes)
     attr_accessible :readable_id, :user_id, :readable_type, :timestamp
   end
+  # :nocov:
 
   validates_presence_of :user_id, :readable_type
 
