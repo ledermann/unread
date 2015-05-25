@@ -38,7 +38,118 @@ describe Unread::Readable do
         Email.unread_by(unsaved_reader)
       }.to raise_error(ArgumentError)
     end
+
+    describe "should work without any read_marks" do
+      before do
+        ReadMark.delete_all
+      end
+
+      it "should return all objects" do
+        expect(Email.unread_by(@reader)).to eq [@email1, @email2]
+        expect(Email.unread_by(@other_reader)).to eq [@email1, @email2]
+      end
+
+      it "should return unread records" do
+        @email1.mark_as_read! :for => @reader
+
+        expect(Email.unread_by(@reader)).to eq [@email2]
+        expect(Email.unread_by(@reader).count).to eq 1
+      end
+
+      it "should not allow invalid parameter" do
+        [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+          expect {
+            Email.unread_by(not_a_reader)
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      it "should not allow unsaved reader" do
+        unsaved_reader = Reader.new
+
+        expect {
+          Email.unread_by(unsaved_reader)
+        }.to raise_error(ArgumentError)
+      end
+    end
   end
+
+  describe :read_by do
+    it "should return an empty array" do
+      expect(Email.read_by(@reader)).to be_empty
+      expect(Email.read_by(@other_reader)).to be_empty
+    end
+
+    it "should return read records" do
+      @email1.mark_as_read! :for => @reader
+
+      expect(Email.read_by(@reader)).to eq [@email1]
+      expect(Email.read_by(@reader).count).to eq 1
+    end
+
+    it "should return all records when all read" do
+      Email.mark_as_read! :all, :for => @reader
+
+      expect(Email.read_by(@reader)).to eq [@email1, @email2]
+    end
+
+    it "should not allow invalid parameter" do
+      [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+        expect {
+          Email.read_by(not_a_reader)
+        }.to raise_error(ArgumentError)
+      end
+    end
+
+    it "should not allow unsaved reader" do
+      unsaved_reader = Reader.new
+
+      expect {
+        Email.read_by(unsaved_reader)
+      }.to raise_error(ArgumentError)
+    end
+
+    describe "should work without any read_marks" do
+      before do
+        ReadMark.delete_all
+      end
+
+      it "should return an empty array" do
+        expect(Email.read_by(@reader)).to be_empty
+        expect(Email.read_by(@other_reader)).to be_empty
+      end
+
+      it "should return read records" do
+        @email1.mark_as_read! :for => @reader
+
+        expect(Email.read_by(@reader)).to eq [@email1]
+        expect(Email.read_by(@reader).count).to eq 1
+      end
+
+      it "should return all records when all read" do
+        Email.mark_as_read! :all, :for => @reader
+
+        expect(Email.read_by(@reader)).to eq [@email1, @email2]
+      end
+
+      it "should not allow invalid parameter" do
+        [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
+          expect {
+            Email.read_by(not_a_reader)
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      it "should not allow unsaved reader" do
+        unsaved_reader = Reader.new
+
+        expect {
+          Email.read_by(unsaved_reader)
+        }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
 
   describe :with_read_marks_for do
     it "should return readables" do
