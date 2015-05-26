@@ -27,7 +27,8 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build(:user_id => user.id)
+              rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build
+              rm.user_id   = user.id
               rm.timestamp = timestamp
               rm.save!
             end
@@ -70,8 +71,9 @@ module Unread
         user.read_marks.where(:readable_type => self.base_class.name).single.older_than(timestamp).delete_all
 
         # Change the global timestamp for this user
-        rm = user.read_mark_global(self) || user.read_marks.build(:readable_type => self.base_class.name)
-        rm.timestamp = timestamp - 1.second
+        rm = user.read_mark_global(self) || user.read_marks.build
+        rm.readable_type = self.base_class.name
+        rm.timestamp     = timestamp - 1.second
         rm.save!
       end
 
@@ -91,7 +93,12 @@ module Unread
 
         ReadMark.transaction do
           ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
-          ReadMark.create!    :readable_type => self.base_class.name, :user_id => user.id, :timestamp => Time.current
+
+          ReadMark.create! do |rm|
+            rm.readable_type = self.base_class.name
+            rm.user_id       = user.id
+            rm.timestamp     = Time.current
+          end
         end
 
         user.forget_memoized_read_mark_global
@@ -131,7 +138,8 @@ module Unread
 
         ReadMark.transaction do
           if unread?(user)
-            rm = read_mark(user) || read_marks.build(:user_id => user.id)
+            rm = read_mark(user) || read_marks.build
+            rm.user_id   = user.id
             rm.timestamp = self.send(readable_options[:on])
             rm.save!
           end

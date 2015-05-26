@@ -333,7 +333,12 @@ describe Unread::Readable do
     end
 
     it "should not delete read marks from other readables" do
-      other_read_mark = @reader.read_marks.create! :readable_type => 'Foo', :readable_id => 42, :timestamp => 5.years.ago
+      other_read_mark = @reader.read_marks.create! do |rm|
+        rm.readable_type = 'Foo'
+        rm.readable_id   = 42
+        rm.timestamp     = 5.years.ago
+      end
+
       Email.cleanup_read_marks!
 
       expect(ReadMark.exists?(other_read_mark.id)).to be_truthy
