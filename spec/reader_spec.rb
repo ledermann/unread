@@ -149,5 +149,13 @@ describe Unread::Reader do
         expect(readers[1].have_read?(@email1)).to be_falsey
       }.to perform_queries(1)
     end
+
+    it "should work with eager-loaded read marks for the correct readable" do
+      @email1.mark_as_read! :for => @reader
+
+      readers = Reader.with_read_marks_for(@email1).to_a
+      expect(readers[0].have_read?(@email1)).to be_truthy
+      expect(readers[0].have_read?(@email2)).to be_falsey
+    end
   end
 end

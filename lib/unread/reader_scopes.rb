@@ -19,7 +19,9 @@ module Unread
       end
 
       def with_read_marks_for(readable)
-        join_read_marks(readable).select("#{table_name}.*, read_marks.id AS read_mark_id")
+        join_read_marks(readable).select("#{table_name}.*, read_marks.id AS read_mark_id,
+                                         '#{readable.class.base_class.name}' AS read_mark_readable_type,
+                                          #{readable.try(readable.class.primary_key)} AS read_mark_readable_id")
       end
     end
   end
