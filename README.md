@@ -110,20 +110,20 @@ User.have_not_read(message1)
 
 ## Get users that have read a given message
 User.have_read(message1)
-# => [ ]
-
-message1.mark_as_read! :for => user1
-User.have_read(message1)
 # => [ user1 ]
+
+message1.mark_as_read! :for => user2
+User.have_read(message1)
+# => [ user1, user2 ]
 
 Message.mark_as_read! :all, :for => user1
 User.have_not_read(message1)
-# => [ user2 ]
+# => [ ]
 User.have_not_read(message2)
 # => [ user2 ]
 
 User.have_read(message1)
-# => [ user1 ]
+# => [ user1, user2 ]
 User.have_read(message2)
 # => [ user1 ]
 
