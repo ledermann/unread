@@ -26,12 +26,19 @@ module Unread
       end
 
       def have_read?(readable)
-        if self.respond_to?(:read_mark_id)
+        if self.respond_to?(:read_mark_id) && read_mark_id_belongs_to?(readable)
           # For use with scope "with_read_marks_for"
           !self.read_mark_id.nil?
         else
           !self.class.have_not_read(readable).exists?(self.id)
         end
+      end
+
+      private
+
+      def read_mark_id_belongs_to?(readable)
+        self.read_mark_readable_type == readable.class.base_class.name &&
+        (self.read_mark_readable_id.nil? || self.read_mark_readable_id == readable.id)
       end
     end
   end

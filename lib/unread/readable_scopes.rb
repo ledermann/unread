@@ -35,7 +35,7 @@ module Unread
       end
 
       def with_read_marks_for(user)
-        join_read_marks(user).select("#{table_name}.*, read_marks.id AS read_mark_id")
+        join_read_marks(user).select("#{table_name}.*, read_marks.id AS read_mark_id, #{user.id} AS read_mark_user_id")
       end
     end
   end
