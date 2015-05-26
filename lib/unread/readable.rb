@@ -53,28 +53,28 @@ module Unread
         assert_reader_class
 
         ReadMark.reader_scope.find_each do |user|
-          ReadMark.transaction do
-            if oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
-              # There are unread items, so update the global read_mark for this user to the oldest
-              # unread item and delete older read_marks
-              update_read_marks_for_user(user, oldest_timestamp)
-            else
-              # There is no unread item, so deletes all markers and move global timestamp
-              reset_read_marks_for_user(user)
-            end
+          if oldest_timestamp = read_scope(user).unread_by(user).minimum(readable_options[:on])
+            # There are unread items, so update the global read_mark for this user to the oldest
+            # unread item and delete older read_marks
+            update_read_marks_for_user(user, oldest_timestamp)
+          else
+            # There is no unread item, so deletes all markers and move global timestamp
+            reset_read_marks_for_user(user)
           end
         end
       end
 
       def update_read_marks_for_user(user, timestamp)
-        # Delete markers OLDER than the given timestamp
-        user.read_marks.where(:readable_type => self.base_class.name).single.older_than(timestamp).delete_all
+        ReadMark.transaction do
+          # Delete markers OLDER than the given timestamp
+          user.read_marks.where(:readable_type => self.base_class.name).single.older_than(timestamp).delete_all
 
-        # Change the global timestamp for this user
-        rm = user.read_mark_global(self) || user.read_marks.build
-        rm.readable_type = self.base_class.name
-        rm.timestamp     = timestamp - 1.second
-        rm.save!
+          # Change the global timestamp for this user
+          rm = user.read_mark_global(self) || user.read_marks.build
+          rm.readable_type = self.base_class.name
+          rm.timestamp     = timestamp - 1.second
+          rm.save!
+        end
       end
 
       def reset_read_marks_for_all
