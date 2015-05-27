@@ -6,16 +6,16 @@ module Unread
 
         joins "LEFT JOIN read_marks
                 ON read_marks.readable_type  = '#{base_class.name}'
-               AND read_marks.readable_id    = #{table_name}.#{primary_key}
+               AND read_marks.readable_id    = #{quoted_table_name}.#{quoted_primary_key}
                AND read_marks.user_id        = #{user.id}
-               AND read_marks.timestamp     >= #{table_name}.#{readable_options[:on]}"
+               AND read_marks.timestamp     >= #{quoted_table_name}.#{readable_options[:on]}"
       end
 
       def unread_by(user)
         result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("read_marks.id IS NULL AND #{table_name}.#{readable_options[:on]} > ?", global_time_stamp)
+          result = result.where("read_marks.id IS NULL AND #{quoted_table_name}.#{readable_options[:on]} > ?", global_time_stamp)
         else
           result = result.where('read_marks.id IS NULL')
         end
@@ -27,7 +27,7 @@ module Unread
         result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("read_marks.id IS NOT NULL OR #{table_name}.#{readable_options[:on]} <= ?", global_time_stamp)
+          result = result.where("read_marks.id IS NOT NULL OR #{quoted_table_name}.#{readable_options[:on]} <= ?", global_time_stamp)
         else
           result = result.where('read_marks.id IS NOT NULL')
         end
@@ -36,7 +36,7 @@ module Unread
       end
 
       def with_read_marks_for(user)
-        join_read_marks(user).select("#{table_name}.*,
+        join_read_marks(user).select("#{quoted_table_name}.*,
                                      read_marks.id AS read_mark_id,
                                      #{user.id} AS read_mark_user_id")
       end
