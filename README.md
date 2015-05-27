@@ -57,6 +57,11 @@ rake db:migrate
 ```ruby
 class User < ActiveRecord::Base
   acts_as_reader
+
+  # or, if only a subset of users are readers:
+
+  scope :admins, -> { where(:is_admin => true) }
+  acts_as_reader :scope => -> { admins }
 end
 
 class Message < ActiveRecord::Base

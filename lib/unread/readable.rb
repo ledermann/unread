@@ -80,10 +80,17 @@ module Unread
       def reset_read_marks_for_all
         ReadMark.transaction do
           ReadMark.delete_all :readable_type => self.base_class.name
+
+          # Build a SELECT statement with all relevant readers
+          reader_sql = ReadMark.
+                         reader_scope.
+                         select("#{ReadMark.reader_scope.quoted_table_name}.#{ReadMark.reader_scope.quoted_primary_key},
+                                '#{self.base_class.name}',
+                                '#{Time.current.to_s(:db)}'").to_sql
+
           ReadMark.connection.execute <<-EOT
             INSERT INTO read_marks (user_id, readable_type, timestamp)
-            SELECT #{ReadMark.reader_class.quoted_primary_key}, '#{self.base_class.name}', '#{Time.current.to_s(:db)}'
-            FROM #{ReadMark.reader_class.quoted_table_name}
+            #{reader_sql}
           EOT
         end
       end

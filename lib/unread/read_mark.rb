@@ -7,7 +7,7 @@ class ReadMark < ActiveRecord::Base
   scope :single, lambda { where('readable_id IS NOT NULL') }
   scope :older_than, lambda { |timestamp| where([ 'timestamp < ?', timestamp ]) }
 
-  # Returns the class defined by acts_as_reader
+  # Returns the class and options defined by acts_as_reader
   class_attribute :reader_class
   class_attribute :reader_options
 
@@ -15,11 +15,6 @@ class ReadMark < ActiveRecord::Base
   class_attribute :readable_classes
 
   def self.reader_scope
-    result = reader_class
-
-    Array(reader_options[:scopes]).each do |scope|
-      result = result.send(scope)
-    end
-    result
+    reader_options[:scope].try(:call) || self
   end
 end
