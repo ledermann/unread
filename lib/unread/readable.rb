@@ -86,7 +86,7 @@ module Unread
                          reader_scope.
                          select("#{ReadMark.reader_scope.quoted_table_name}.#{ReadMark.reader_scope.quoted_primary_key},
                                 '#{self.base_class.name}',
-                                '#{Time.current.to_s(:db)}'").to_sql
+                                '#{connection.quoted_date Time.current}'").to_sql
 
           ReadMark.connection.execute <<-EOT
             INSERT INTO read_marks (user_id, readable_type, timestamp)

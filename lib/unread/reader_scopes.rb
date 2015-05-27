@@ -8,7 +8,7 @@ module Unread
                 ON read_marks.readable_type  = '#{readable.class.base_class.name}'
                AND (read_marks.readable_id   = #{readable.id} OR read_marks.readable_id IS NULL)
                AND read_marks.user_id        = #{quoted_table_name}.#{quoted_primary_key}
-               AND read_marks.timestamp     >= '#{readable.send(readable.class.readable_options[:on]).to_s(:db)}'"
+               AND read_marks.timestamp     >= '#{connection.quoted_date readable.send(readable.class.readable_options[:on])}'"
       end
 
       def have_not_read(readable)
