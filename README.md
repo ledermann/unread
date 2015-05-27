@@ -59,7 +59,6 @@ class User < ActiveRecord::Base
   acts_as_reader
 
   # or, if only a subset of users are readers:
-
   scope :admins, -> { where(:is_admin => true) }
   acts_as_reader :scope => -> { admins }
 end
@@ -140,8 +139,8 @@ users[0].have_read?(message1)
 users[1].have_read?(message2)
 # => false
 
-# Optional: Cleaning up unneeded markers.
-# Do this in a cron job once a day.
+# Optional: Cleaning up unneeded markers
+# Do this in a cron job once a day
 Message.cleanup_read_marks!
 ```
 
@@ -172,7 +171,7 @@ Generated query:
 ```sql
 SELECT messages.*
 FROM messages
-LEFT JOIN read_marks ON read_marks.readable_type = 'Message'
+LEFT JOIN read_marks ON read_marks.readable_type = "Message"
                     AND read_marks.readable_id = messages.id
                     AND read_marks.user_id = 42
                     AND read_marks.timestamp >= messages.created_at
@@ -181,16 +180,6 @@ AND messages.created_at > '2010-10-20 08:50:00'
 ```
 
 Hint: You should add a database index on `messages.created_at`.
-
-
-## Similar tools
-
-There are two other gems/plugins doing a similar job:
-
-* http://github.com/jhnvz/mark_as_read
-* http://github.com/mbleigh/acts-as-readable
-
-Unfortunately, both of them have a lack of performance, because they calculate the unread records doing a `find(:all)`, which should be avoided for a large amount of records. This gem is based on a timestamp algorithm and therefore it's very fast.
 
 
 Copyright (c) 2010-2015 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
