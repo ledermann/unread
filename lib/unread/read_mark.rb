@@ -15,6 +15,6 @@ class ReadMark < ActiveRecord::Base
   class_attribute :readable_classes
 
   def self.reader_scope
-    reader_options[:scope].try(:call) || self
+    reader_options[:scope].try(:call) || reader_class
   end
 end
