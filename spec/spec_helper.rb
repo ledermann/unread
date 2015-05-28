@@ -51,9 +51,15 @@ if I18n.respond_to?(:enforce_available_locales=)
 end
 
 def setup_db
-  puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING}"
+  configs = YAML.load_file('spec/database.yml')
+  ActiveRecord::Base.configurations = configs
 
-  ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
+  db_name = ENV['DB'] || 'sqlite'
+
+  puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING} on #{db_name}"
+
+  ActiveRecord::Base.establish_connection(db_name.to_sym)
+  ActiveRecord::Base.default_timezone = :utc
   ActiveRecord::Migration.verbose = false
 
   require File.expand_path('../../lib/generators/unread/migration/templates/migration.rb', __FILE__)

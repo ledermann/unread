@@ -13,3 +13,8 @@ gemfile:
   - ci/Gemfile-rails-4-2
 before_install: gem update bundler
 sudo: false
+env:
+  - DB=sqlite
+  - DB=mysql
+before_script:
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database IF NOT EXISTS unread_test;'; fi"
