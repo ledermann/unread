@@ -25,6 +25,11 @@ describe Unread::Readable do
       expect(Email.unread_by(@other_reader)).to eq [@email1, @email2]
     end
 
+    it "should return empty array directly after marking all as read" do
+      Email.mark_as_read! :all, :for => @reader
+      expect(Email.unread_by(@reader)).to eq([])
+    end
+
     it "should not allow invalid parameter" do
       [ 42, nil, 'foo', :foo, {} ].each do |not_a_reader|
         expect {
