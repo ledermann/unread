@@ -5,7 +5,7 @@ module Unread
 
   module Base
     def acts_as_reader(options={})
-      ReadMark.belongs_to :user, :class_name => self.to_s
+      ReadMark.belongs_to :user, :class_name => self.to_s, inverse_of: :read_marks
 
       has_many :read_marks, :dependent => :delete_all, :foreign_key => 'user_id', :inverse_of => :user
 
@@ -32,7 +32,7 @@ module Unread
       options.reverse_merge!(:on => :updated_at)
       self.readable_options = options
 
-      has_many :read_marks, :as => :readable, :dependent => :delete_all
+      has_many :read_marks, :as => :readable, :dependent => :delete_all, inverse_of: :readable
 
       ReadMark.readable_classes ||= []
       ReadMark.readable_classes << self unless ReadMark.readable_classes.include?(self)
