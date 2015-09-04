@@ -12,7 +12,7 @@ module Unread
       end
 
       def have_not_read(readable)
-        join_read_marks(readable).where("read_marks.id IS NULL")
+        join_read_marks(readable).where('read_marks.id IS NULL')
       end
 
       def have_read(readable)

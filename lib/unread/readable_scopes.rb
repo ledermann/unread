@@ -15,32 +15,28 @@ module Unread
         result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("read_marks.id IS NULL
-                                 AND #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])} > ?", global_time_stamp)
+          result.where("read_marks.id IS NULL
+                        AND #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])} > ?", global_time_stamp)
         else
-          result = result.where('read_marks.id IS NULL')
+          result.where('read_marks.id IS NULL')
         end
-
-        result
       end
 
       def read_by(user)
         result = join_read_marks(user)
 
         if global_time_stamp = user.read_mark_global(self).try(:timestamp)
-          result = result.where("read_marks.id IS NOT NULL
-                                 OR #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])} <= ?", global_time_stamp)
+          result.where("read_marks.id IS NOT NULL
+                        OR #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])} <= ?", global_time_stamp)
         else
-          result = result.where('read_marks.id IS NOT NULL')
+          result.where('read_marks.id IS NOT NULL')
         end
-
-        result
       end
 
       def with_read_marks_for(user)
         join_read_marks(user).select("#{quoted_table_name}.*,
                                      read_marks.id AS read_mark_id,
-                                     #{quote_bound_value user.id} AS read_mark_user_id")
+                                     #{quote_bound_value(user.id)} AS read_mark_user_id")
       end
     end
   end
