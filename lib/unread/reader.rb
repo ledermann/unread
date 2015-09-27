@@ -4,7 +4,7 @@ module Unread
       def assert_readable(readable)
         assert_readable_class
 
-        unless ReadMark.readable_classes.include?(readable.class)
+        unless ReadMark.readable_classes.include?(readable.class) or is_single_table_inheritance?(readable.class)
           raise ArgumentError, "Class #{readable.class.name} is not registered by acts_as_readable."
         end
         raise ArgumentError, "The given #{readable.class.name} has no id." unless readable.id
@@ -12,6 +12,14 @@ module Unread
 
       def assert_readable_class
         raise RuntimeError, 'There is no class using acts_as_readable.' unless ReadMark.readable_classes.try(:any?)
+      end
+
+      def is_single_table_inheritance?(readable)
+        readable.ancestors.each do |ancestor|
+          return true if ReadMark.readable_classes.include?(ancestor) and ancestor.table_name == readable.table_name
+        end
+
+        false
       end
     end
 
