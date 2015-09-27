@@ -157,14 +157,13 @@ describe Unread::Readable do
     end
   end
 
-
   describe :with_read_marks_for do
     it "should return readables" do
       expect(Email.with_read_marks_for(@reader).to_a).to eq([@email1, @email2])
     end
 
     it "should be countable" do
-      expect(Email.with_read_marks_for(@reader).count(:messageid)).to eq(2)
+      expect(Email.with_read_marks_for(@reader).count(:uid)).to eq(2)
     end
 
     it "should not allow invalid parameter" do

@@ -35,7 +35,7 @@ describe Unread::Base do
     end
 
     it "should add class to ReadMark.readable_classes" do
-      expect(ReadMark.readable_classes).to eq [ Email ]
+      expect(ReadMark.readable_classes).to eq [ Document ]
     end
 
     it "should use default options" do

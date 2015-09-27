@@ -10,6 +10,6 @@ describe ReadMark do
   end
 
   it "should have readable_classes" do
-    expect(ReadMark.readable_classes).to eq [Email]
+    expect(ReadMark.readable_classes).to eq [Document]
   end
 end

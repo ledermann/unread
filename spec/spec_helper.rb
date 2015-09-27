@@ -70,7 +70,8 @@ def setup_db
       t.string :name
     end
 
-    create_table :emails, :primary_key => 'messageid', :force => true do |t|
+    create_table :documents, :primary_key => 'uid', :force => true do |t|
+      t.string :type
       t.string :subject
       t.text :content
       t.datetime :created_at
