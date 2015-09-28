@@ -9,9 +9,9 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'active_record'
 require 'timecop'
 require 'unread'
+require 'generators/unread/migration/templates/migration.rb'
 
 require 'model/reader'
 require 'model/email'
@@ -42,7 +42,7 @@ RSpec.configure do |config|
   end
 
   config.after :suite do
-    UnreadMigration.migrate(:down)
+    UnreadMigration.down
   end
 end
 
@@ -62,22 +62,8 @@ def setup_db
   ActiveRecord::Base.default_timezone = :utc
   ActiveRecord::Migration.verbose = false
 
-  require File.expand_path('../../lib/generators/unread/migration/templates/migration.rb', __FILE__)
-  UnreadMigration.migrate(:up)
-
-  ActiveRecord::Schema.define(:version => 1) do
-    create_table :readers, :primary_key => 'number', :force => true do |t|
-      t.string :name
-    end
-
-    create_table :documents, :primary_key => 'uid', :force => true do |t|
-      t.string :type
-      t.string :subject
-      t.text :content
-      t.datetime :created_at
-      t.datetime :updated_at
-    end
-  end
+  UnreadMigration.up
+  SpecMigration.up
 end
 
 def clear_db

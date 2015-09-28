@@ -1,3 +1,5 @@
+require 'active_record'
+
 require 'unread/base'
 require 'unread/read_mark'
 require 'unread/readable'

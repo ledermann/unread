@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'unread'
+
+$LOAD_PATH.unshift(File.expand_path('..', File.dirname(__FILE__)))
+require 'lib/generators/unread/migration/templates/migration.rb'
+require 'spec/support/spec_migration.rb'
+
+require 'spec/model/reader'
+require 'spec/model/email'
+
+# You can add fixtures and/or initialization code here to make experimenting
+# with your gem easier. You can also use a different console, if you like.
+
+# (If you use this, don't forget to add pry to your Gemfile!)
+# require "pry"
+# Pry.start
+
+ActiveRecord::Base.configurations = YAML.load_file('spec/database.yml')
+ActiveRecord::Base.establish_connection(:sqlite)
+ActiveRecord::Migration.verbose = false
+
+UnreadMigration.up
+SpecMigration.up
+
+require 'irb'
+IRB.start
