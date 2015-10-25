@@ -8,6 +8,7 @@ module Unread
                 ON read_marks.readable_type  = '#{base_class.name}'
                AND read_marks.readable_id    = #{quoted_table_name}.#{quoted_primary_key}
                AND read_marks.user_id        = #{quote_bound_value(user.id)}
+               AND read_marks.user_type      = #{quote_bound_value(user.class.base_class.name)}
                AND read_marks.timestamp     >= #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])}"
       end
 
@@ -36,6 +37,7 @@ module Unread
       def with_read_marks_for(user)
         join_read_marks(user).select("#{quoted_table_name}.*,
                                      read_marks.id AS read_mark_id,
+                                     #{quote_bound_value(user.class.base_class.name)} AS read_mark_user_type,
                                      #{quote_bound_value(user.id)} AS read_mark_user_id")
       end
     end

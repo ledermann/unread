@@ -5,9 +5,11 @@ module Unread
 
   module Base
     def acts_as_reader(options={})
-      ReadMark.belongs_to :user, :class_name => self.to_s, inverse_of: :read_marks
+      unless ReadMark.reflections.include?(:user)
+        ReadMark.belongs_to :user, :polymorphic => true, inverse_of: :read_marks
+      end
 
-      has_many :read_marks, :dependent => :delete_all, :foreign_key => 'user_id', :inverse_of => :user
+      has_many :read_marks, :dependent => :delete_all, as: :user, :inverse_of => :user
 
       after_create do |user|
         # We assume that a new user should not be tackled by tons of old messages
@@ -18,8 +20,10 @@ module Unread
         end
       end
 
-      ReadMark.reader_class = self
-      ReadMark.reader_options = options
+      ReadMark.reader_classes ||= []
+      ReadMark.reader_options ||= {}
+      ReadMark.reader_classes << self
+      ReadMark.reader_options[self] = options
 
       include Reader::InstanceMethods
       extend Reader::ClassMethods

@@ -27,8 +27,9 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              rm = obj.read_marks.where(:user_id => user.id).first || obj.read_marks.build
+              rm = obj.read_marks.where(:user_id => user.id, :user_id => user.class.base_class.name).first || obj.read_marks.build
               rm.user_id   = user.id
+              rm.user_type = user.class.base_class.name
               rm.timestamp = timestamp
               rm.save!
             end
@@ -85,11 +86,12 @@ module Unread
           reader_sql = ReadMark.
                          reader_scope.
                          select("#{ReadMark.reader_scope.quoted_table_name}.#{ReadMark.reader_scope.quoted_primary_key},
+                                '#{ReadMark.reader_scope.class}',
                                 '#{self.base_class.name}',
                                 '#{connection.quoted_date Time.current}'").to_sql
 
           ReadMark.connection.execute <<-EOT
-            INSERT INTO read_marks (user_id, readable_type, timestamp)
+            INSERT INTO read_marks (user_id, user_type, readable_type, timestamp)
             #{reader_sql}
           EOT
         end
@@ -99,11 +101,12 @@ module Unread
         assert_reader(user)
 
         ReadMark.transaction do
-          ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id
+          ReadMark.delete_all :readable_type => self.base_class.name, :user_id => user.id, :user_type => user.class.base_class.name
 
           ReadMark.create! do |rm|
             rm.readable_type = self.base_class.name
             rm.user_id       = user.id
+            rm.user_type     = user.class.base_class.name
             rm.timestamp     = Time.current
           end
         end
@@ -114,12 +117,12 @@ module Unread
       def assert_reader(user)
         assert_reader_class
 
-        raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader." unless user.is_a?(ReadMark.reader_class)
+        raise ArgumentError, "Class #{user.class.name} is not registered by acts_as_reader." unless ReadMark.reader_classes.any? { |klass| user.is_a?(klass) }
         raise ArgumentError, "The given user has no id." unless user.id
       end
 
       def assert_reader_class
-        raise RuntimeError, 'There is no class using acts_as_reader.' unless ReadMark.reader_class
+        raise RuntimeError, 'There is no class using acts_as_reader.' unless ReadMark.reader_classes
       end
     end
 
@@ -147,6 +150,7 @@ module Unread
           if unread?(user)
             rm = read_mark(user) || read_marks.build
             rm.user_id   = user.id
+            rm.user_type = user.class.base_class.name
             rm.timestamp = self.send(readable_options[:on])
             rm.save!
           end
@@ -154,13 +158,14 @@ module Unread
       end
 
       def read_mark(user)
-        read_marks.where(:user_id => user.id).first
+        read_marks.where(:user_id => user.id, user_type: user.class.base_class.name).first
       end
 
       private
 
       def read_mark_id_belongs_to?(user)
-        self.read_mark_user_id == user.id
+        self.read_mark_user_id == user.id &&
+          self.read_mark_user_type == user.class.base_class.name
       end
     end
   end
