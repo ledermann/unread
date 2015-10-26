@@ -4,6 +4,10 @@ class SpecMigration < ActiveRecord::Migration
       t.string :name
     end
 
+    create_table :different_readers, :primary_key => 'number', :force => true do |t|
+      t.string :name
+    end
+
     create_table :documents, :primary_key => 'uid', :force => true do |t|
       t.string :type
       t.string :subject

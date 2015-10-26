@@ -27,7 +27,7 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              rm = obj.read_marks.where(:user_id => user.id, :user_id => user.class.base_class.name).first || obj.read_marks.build
+              rm = obj.read_marks.where(:user_id => user.id, :user_type => user.class.base_class.name).first || obj.read_marks.build
               rm.user_id   = user.id
               rm.user_type = user.class.base_class.name
               rm.timestamp = timestamp

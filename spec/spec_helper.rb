@@ -14,6 +14,7 @@ require 'unread'
 require 'generators/unread/migration/templates/migration.rb'
 
 require 'model/reader'
+require 'model/different_reader'
 require 'model/email'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
@@ -68,6 +69,7 @@ end
 
 def clear_db
   Reader.delete_all
+  DifferentReader.delete_all
   Email.delete_all
   ReadMark.delete_all
 end
