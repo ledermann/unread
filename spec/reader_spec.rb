@@ -4,6 +4,7 @@ describe Unread::Reader do
   before :each do
     @reader = Reader.create! :name => 'David'
     @other_reader = Reader.create :name => 'Matz'
+    @different_reader = DifferentReader.create! :name => 'Behrooz', :number => @reader.number
     wait
     @email1 = Email.create!
     wait
@@ -21,6 +22,25 @@ describe Unread::Reader do
 
       expect(Reader.have_not_read(@email1)).to eq [@other_reader]
       expect(Reader.have_not_read(@email1).count).to eq 1
+
+      expect(Reader.have_not_read(@email2)).to eq [@reader, @other_reader]
+    end
+
+    it "should take the type of reader into account" do
+      # even though the id of @reader and @different_reader is the same because
+      # they are different object types, the @email1 should only be marked as
+      # read for @reader.
+      @email1.mark_as_read! :for => @reader
+
+      expect(Reader.have_not_read(@email1)).to eq [@other_reader]
+      expect(Reader.have_not_read(@email1).count).to eq 1
+
+      expect(DifferentReader.have_not_read(@email1)).to eq [@different_reader]
+      expect(DifferentReader.have_not_read(@email1).count).to eq 1
+
+      @email1.mark_as_read! :for => @different_reader
+
+      expect(DifferentReader.have_not_read(@email1).count).to eq 0
 
       expect(Reader.have_not_read(@email2)).to eq [@reader, @other_reader]
     end
