@@ -14,7 +14,7 @@ describe Unread::Base do
     end
 
     it "should define association for ReadMark" do
-      expect(@reader.read_marks.first.user).to eq(@reader)
+      expect(@reader.read_marks.first.reader).to eq(@reader)
     end
 
     it "should reset read_marks for created reader" do
