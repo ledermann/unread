@@ -9,10 +9,10 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 ## Features
 
-* Manages unread records for anything you want users to read (like messages, documents, comments etc.)
+* Manages unread records for anything you want readers (e.g. users) to read (like messages, documents, comments etc.)
 * Supports _mark as read_ to mark a **single** record as read
 * Supports _mark all as read_ to mark **all** records as read in a single step
-* Gives you a scope to get the unread records for a given user
+* Gives you a scope to get the unread records for a given reader
 * Needs only one additional database table
 * Most important: Great performance
 
@@ -51,25 +51,25 @@ rails g unread:migration
 rake db:migrate
 ```
 
-## Upgrade from <= 0.6.3
+## Upgrade to v0.7.0
 
-We have changed the unread in a way that can accept any type of classes as reader and it's not limited to `User` class anymore. So you can do stuff like:
+With v0.7.0 the gem accepts any type of classes as reader and it's not limited to `User` class anymore. So you can do stuff like:
 
 ```ruby
 Customer.have_not_read(message1)
 message1.mark_as_read! :for => Customer.find(1)
 ```
 
-If you are upgrading from 0.6.3 or older versions, you need to do the following:
+If you are upgrading from 0.6.3 or older versions, you need to do the following after upgrading the gem:
 
-```
-rails g migration unread:polymorphic_reader_migration
+```shell
+rails g unread:polymorphic_reader_migration
 rake db:migrate
 ```
 
-This will alter the read_marks table to make user_id a polymorphic relation named `reader`. Therefore, user_id is going to be renamed to reader_id and reader_type is going to be added.
+This will alter the `read_marks` table to replace `user` association to a polymorphic association named `reader`. Therefore, `user_id` is going to be renamed to `reader_id` and `reader_type` is going to be added.
 
-This change, should not break your code unless you've worked with ReadMark model directly.
+This change should not break your code unless you've worked with `ReadMark` model directly.
 
 ## Usage
 
@@ -192,8 +192,8 @@ SELECT messages.*
 FROM messages
 LEFT JOIN read_marks ON read_marks.readable_type = "Message"
                     AND read_marks.readable_id = messages.id
-                    AND read_marks.user_id = 42
-                    AND read_marks.user_type = 'User'
+                    AND read_marks.reader_id = 42
+                    AND read_marks.reader_type = 'User'
                     AND read_marks.timestamp >= messages.created_at
 WHERE read_marks.id IS NULL
 AND messages.created_at > '2010-10-20 08:50:00'
@@ -202,4 +202,4 @@ AND messages.created_at > '2010-10-20 08:50:00'
 Hint: You should add a database index on `messages.created_at`.
 
 
-Copyright (c) 2010-2015 [Georg Ledermann](http://www.georg-ledermann.de), released under the MIT license
+Copyright (c) 2010-2015 [Georg Ledermann](http://www.georg-ledermann.de) and [contributors](https://github.com/ledermann/unread/graphs/contributors), released under the MIT license
