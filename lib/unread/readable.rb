@@ -53,14 +53,16 @@ module Unread
       def cleanup_read_marks!
         assert_reader_class
 
-        ReadMark.reader_scope.find_each do |reader|
-          if oldest_timestamp = read_scope(reader).unread_by(reader).minimum(readable_options[:on])
-            # There are unread items, so update the global read_mark for this reader to the oldest
-            # unread item and delete older read_marks
-            update_read_marks_for_user(reader, oldest_timestamp)
-          else
-            # There is no unread item, so deletes all markers and move global timestamp
-            reset_read_marks_for_user(reader)
+        ReadMark.reader_classes.each do |reader_class|
+          ReadMark.reader_scope(reader_class).find_each do |reader|
+            if oldest_timestamp = read_scope(reader).unread_by(reader).minimum(readable_options[:on])
+              # There are unread items, so update the global read_mark for this reader to the oldest
+              # unread item and delete older read_marks
+              update_read_marks_for_user(reader, oldest_timestamp)
+            else
+              # There is no unread item, so deletes all markers and move global timestamp
+              reset_read_marks_for_user(reader)
+            end
           end
         end
       end
@@ -82,18 +84,20 @@ module Unread
         ReadMark.transaction do
           ReadMark.delete_all :readable_type => self.base_class.name
 
-          # Build a SELECT statement with all relevant readers
-          reader_sql = ReadMark.
-                         reader_scope.
-                         select("#{ReadMark.reader_scope.quoted_table_name}.#{ReadMark.reader_scope.quoted_primary_key},
-                                '#{ReadMark.reader_scope.class}',
-                                '#{self.base_class.name}',
-                                '#{connection.quoted_date Time.current}'").to_sql
+          ReadMark.reader_classes.each do |reader_class|
+            # Build a SELECT statement with all relevant readers
+            reader_sql = ReadMark.
+                           reader_scope(reader_class).
+                           select("#{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key},
+                                  '#{reader_class}',
+                                  '#{self.base_class.name}',
+                                  '#{connection.quoted_date Time.current}'").to_sql
 
-          ReadMark.connection.execute <<-EOT
-            INSERT INTO read_marks (reader_id, reader_type, readable_type, timestamp)
-            #{reader_sql}
-          EOT
+            ReadMark.connection.execute <<-EOT
+              INSERT INTO read_marks (reader_id, reader_type, readable_type, timestamp)
+              #{reader_sql}
+            EOT
+          end
         end
       end
 

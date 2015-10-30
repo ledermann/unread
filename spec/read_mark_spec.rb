@@ -6,11 +6,8 @@ describe ReadMark do
   end
 
   it "should have reader_scope" do
-    expect(ReadMark.reader_scope).to eq Reader.not_foo.not_bar
-  end
-
-  it "should have reader_scope with klass" do
     expect(ReadMark.reader_scope(Reader)).to eq Reader.not_foo.not_bar
+    expect(ReadMark.reader_scope(DifferentReader)).to eq DifferentReader
   end
 
   it "should have readable_classes" do

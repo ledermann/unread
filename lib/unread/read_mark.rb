@@ -14,8 +14,7 @@ class ReadMark < ActiveRecord::Base
   # Returns the classes defined by acts_as_readable
   class_attribute :readable_classes
 
-  def self.reader_scope(klass = nil)
-    klass ||= reader_classes.first
+  def self.reader_scope(klass)
     reader_options[klass][:scope].try(:call) || klass
   end
 end
