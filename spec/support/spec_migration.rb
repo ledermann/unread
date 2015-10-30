@@ -8,6 +8,10 @@ class SpecMigration < ActiveRecord::Migration
       t.string :name
     end
 
+    create_table :customers, :force => true do |t|
+      t.string :type
+    end
+
     create_table :documents, :primary_key => 'uid', :force => true do |t|
       t.string :type
       t.string :subject

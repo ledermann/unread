@@ -89,7 +89,7 @@ module Unread
             reader_sql = ReadMark.
                            reader_scope(reader_class).
                            select("#{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key},
-                                  '#{reader_class}',
+                                  '#{reader_class.base_class}',
                                   '#{self.base_class.name}',
                                   '#{connection.quoted_date Time.current}'").to_sql
 

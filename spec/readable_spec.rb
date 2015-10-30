@@ -4,6 +4,7 @@ describe Unread::Readable do
   before :each do
     @reader = Reader.create! :name => 'David'
     @other_reader = Reader.create :name => 'Matz'
+    @sti_reader = StiReader.create!
     wait
     @email1 = Email.create!
     wait
@@ -279,7 +280,7 @@ describe Unread::Readable do
       expect(@reader.read_mark_global(Email).timestamp).to eq Time.current
       expect(@reader.read_marks.single).to eq []
       expect(ReadMark.single.count).to eq 0
-      expect(ReadMark.global.count).to eq 2
+      expect(ReadMark.global.count).to eq 3
     end
 
     it "should mark all objects as read with existing read objects" do
@@ -310,11 +311,19 @@ describe Unread::Readable do
   end
 
   describe :reset_read_marks_for_all do
-    it "should reset read marks" do
+    before :each do
       Email.reset_read_marks_for_all
+    end
 
+    it "should reset read marks" do
       expect(ReadMark.single.count).to eq 0
-      expect(ReadMark.global.count).to eq 2
+      expect(ReadMark.global.count).to eq 3
+    end
+
+    it "should handle STI" do
+      expect(@reader.      read_mark_global(Email)).to be_a(ReadMark)
+      expect(@other_reader.read_mark_global(Email)).to be_a(ReadMark)
+      expect(@sti_reader.  read_mark_global(Email)).to be_a(ReadMark)
     end
   end
 
