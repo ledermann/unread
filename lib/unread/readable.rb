@@ -52,32 +52,7 @@ module Unread
 
       def cleanup_read_marks!
         assert_reader_class
-
-        ReadMark.reader_classes.each do |reader_class|
-          reader_class.reader_scope.find_each do |reader|
-            if oldest_timestamp = read_scope(reader).unread_by(reader).minimum(readable_options[:on])
-              # There are unread items, so update the global read_mark for this reader to the oldest
-              # unread item and delete older read_marks
-              update_read_marks_for_user(reader, oldest_timestamp)
-            else
-              # There is no unread item, so deletes all markers and move global timestamp
-              reset_read_marks_for_user(reader)
-            end
-          end
-        end
-      end
-
-      def update_read_marks_for_user(reader, timestamp)
-        ReadMark.transaction do
-          # Delete markers OLDER than the given timestamp
-          reader.read_marks.where(:readable_type => self.base_class.name).single.older_than(timestamp).delete_all
-
-          # Change the global timestamp for this reader
-          rm = reader.read_mark_global(self) || reader.read_marks.build
-          rm.readable_type = self.base_class.name
-          rm.timestamp     = timestamp - 1.second
-          rm.save!
-        end
+        Unread::GarbageCollector.new(self).run!
       end
 
       def reset_read_marks_for_all

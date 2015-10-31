@@ -328,41 +328,9 @@ describe Unread::Readable do
   end
 
   describe :cleanup_read_marks! do
-    it "should delete all single read marks" do
-      expect(@reader.read_marks.single.count).to eq 0
-
-      @email1.mark_as_read! :for => @reader
-
-      expect(Email.unread_by(@reader)).to eq [@email2]
-      expect(@reader.read_marks.single.count).to eq 1
-
+    it "should run garbage collector" do
+      expect(Unread::GarbageCollector).to receive(:new).with(Email).and_return(double :run! => true)
       Email.cleanup_read_marks!
-
-      @reader.reload
-      expect(@reader.read_marks.single.count).to eq 0
-    end
-
-    it "should reset if all objects are read" do
-      @email1.mark_as_read! :for => @reader
-      @email2.mark_as_read! :for => @reader
-
-      expect(@reader.read_marks.single.count).to eq 2
-
-      Email.cleanup_read_marks!
-
-      expect(@reader.read_marks.single.count).to eq 0
-    end
-
-    it "should not delete read marks from other readables" do
-      other_read_mark = @reader.read_marks.create! do |rm|
-        rm.readable_type = 'Foo'
-        rm.readable_id   = 42
-        rm.timestamp     = 5.years.ago
-      end
-
-      Email.cleanup_read_marks!
-
-      expect(ReadMark.exists?(other_read_mark.id)).to be_truthy
     end
   end
 end
