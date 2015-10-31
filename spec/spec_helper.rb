@@ -13,10 +13,10 @@ require 'timecop'
 require 'unread'
 require 'generators/unread/migration/templates/migration.rb'
 
-require 'model/reader'
-require 'model/different_reader'
-require 'model/sti_reader'
-require 'model/email'
+require 'app/models/reader'
+require 'app/models/different_reader'
+require 'app/models/sti_reader'
+require 'app/models/email'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

@@ -7,10 +7,10 @@ $LOAD_PATH.unshift(File.expand_path('..', File.dirname(__FILE__)))
 require 'lib/generators/unread/migration/templates/migration.rb'
 require 'spec/support/spec_migration.rb'
 
-require 'spec/model/reader'
-require 'spec/model/different_reader'
-require 'spec/model/sti_reader'
-require 'spec/model/email'
+require 'spec/app/models/reader'
+require 'spec/app/models/different_reader'
+require 'spec/app/models/sti_reader'
+require 'spec/app/models/email'
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
