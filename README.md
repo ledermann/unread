@@ -51,25 +51,10 @@ rails g unread:migration
 rake db:migrate
 ```
 
-## Upgrade to v0.7.0
+## Upgrade from previous releases
 
-With v0.7.0 the gem accepts any type of classes as reader and it's not limited to `User` class anymore. So you can do stuff like:
+If you upgrade from an older release of this gem, you should read the [upgrade notes](UPGRADE.md).
 
-```ruby
-Customer.have_not_read(message1)
-message1.mark_as_read! :for => Customer.find(1)
-```
-
-If you are upgrading from 0.6.3 or older versions, you need to do the following after upgrading the gem:
-
-```shell
-rails g unread:polymorphic_reader_migration
-rake db:migrate
-```
-
-This will alter the `read_marks` table to replace `user` association to a polymorphic association named `reader`. Therefore, `user_id` is going to be renamed to `reader_id` and `reader_type` is going to be added.
-
-This change should not break your code unless you've worked with `ReadMark` model directly.
 
 ## Usage
 
