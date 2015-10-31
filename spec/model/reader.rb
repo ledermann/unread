@@ -4,5 +4,9 @@ class Reader < ActiveRecord::Base
   scope :not_foo, -> { where('name <> "foo"') }
   scope :not_bar, -> { where('name <> "bar"') }
 
-  acts_as_reader :scope => -> { not_foo.not_bar }
+  acts_as_reader
+
+  def self.reader_scope
+    not_foo.not_bar
+  end
 end

@@ -1,6 +1,12 @@
 module Unread
   module Reader
     module Scopes
+      # This class method may be overriden to restrict readers to a subset of records
+      # It must return self or a ActiveRecord::Relation
+      def reader_scope
+        self
+      end
+
       def join_read_marks(readable)
         assert_readable(readable)
 

@@ -4,7 +4,7 @@ module Unread
   end
 
   module Base
-    def acts_as_reader(options={})
+    def acts_as_reader
       unless ReadMark.reflections.include?(:reader)
         ReadMark.belongs_to :reader, :polymorphic => true, inverse_of: :read_marks
       end
@@ -21,9 +21,7 @@ module Unread
       end
 
       ReadMark.reader_classes ||= []
-      ReadMark.reader_options ||= {}
       ReadMark.reader_classes << self
-      ReadMark.reader_options[self] = options
 
       include Reader::InstanceMethods
       extend Reader::ClassMethods

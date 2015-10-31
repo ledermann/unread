@@ -77,9 +77,10 @@ This change should not break your code unless you've worked with `ReadMark` mode
 class User < ActiveRecord::Base
   acts_as_reader
 
-  # or, if only a subset of users are readers:
-  scope :admins, -> { where(:is_admin => true) }
-  acts_as_reader :scope => -> { admins }
+  # Optional: Allow a subset of users as readers only
+  def self.reader_scope
+    where(:is_admin => true)
+  end
 end
 
 class Message < ActiveRecord::Base

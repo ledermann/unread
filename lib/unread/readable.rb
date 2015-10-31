@@ -54,7 +54,7 @@ module Unread
         assert_reader_class
 
         ReadMark.reader_classes.each do |reader_class|
-          ReadMark.reader_scope(reader_class).find_each do |reader|
+          reader_class.reader_scope.find_each do |reader|
             if oldest_timestamp = read_scope(reader).unread_by(reader).minimum(readable_options[:on])
               # There are unread items, so update the global read_mark for this reader to the oldest
               # unread item and delete older read_marks
@@ -86,8 +86,7 @@ module Unread
 
           ReadMark.reader_classes.each do |reader_class|
             # Build a SELECT statement with all relevant readers
-            reader_sql = ReadMark.
-                           reader_scope(reader_class).
+            reader_sql = reader_class.reader_scope.
                            select("#{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key},
                                   '#{reader_class.base_class}',
                                   '#{self.base_class.name}',
