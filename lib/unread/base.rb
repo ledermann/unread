@@ -11,14 +11,7 @@ module Unread
 
       has_many :read_marks, :dependent => :delete_all, as: :reader, :inverse_of => :reader
 
-      after_create do |reader|
-        # We assume that a new reader should not be tackled by tons of old messages
-        # created BEFORE he signed up.
-        # Instead, the new reader starts with zero unread messages
-        (ReadMark.readable_classes || []).each do |klass|
-          klass.mark_as_read! :all, :for => reader
-        end
-      end
+      after_create :setup_new_reader
 
       ReadMark.reader_classes ||= []
       ReadMark.reader_classes << self

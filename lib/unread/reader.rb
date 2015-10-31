@@ -37,6 +37,15 @@ module Unread
         self.read_mark_readable_type == readable.class.base_class.name &&
         (self.read_mark_readable_id.nil? || self.read_mark_readable_id == readable.id)
       end
+
+      # We assume that a new reader should not be tackled by tons of old messages created BEFORE he signed up.
+      # Instead, the new reader should start with zero unread messages.
+      # If you don't want this, you can override this method in your reader class
+      def setup_new_reader
+        (ReadMark.readable_classes || []).each do |klass|
+          klass.mark_as_read! :all, :for => self
+        end
+      end
     end
   end
 end
