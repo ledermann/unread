@@ -7,7 +7,7 @@ module Unread
 
     def run!
       ReadMark.reader_classes.each do |reader_class|
-        reader_class.reader_scope.find_each do |reader|
+        readers_to_cleanup(reader_class).each do |reader|
           if oldest_timestamp = readable_class.read_scope(reader).
                                   unread_by(reader).
                                   minimum(readable_class.readable_options[:on])
@@ -23,6 +23,17 @@ module Unread
     end
 
   private
+    # Not for every reader a cleanup is needed.
+    # Look for those readers with at least one single read mark
+    def readers_to_cleanup(reader_class)
+      reader_class.
+        reader_scope.
+        joins(:read_marks).
+        where(:read_marks => { :readable_type => readable_class.base_class.name }).
+        group('read_marks.reader_type, read_marks.reader_id').
+        having('COUNT(read_marks.id) > 1')
+    end
+
     def update_read_marks_for_user(reader, timestamp)
       ReadMark.transaction do
         # Delete markers OLDER than the given timestamp
