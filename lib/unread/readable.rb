@@ -55,26 +55,6 @@ module Unread
         Unread::GarbageCollector.new(self).run!
       end
 
-      def reset_read_marks_for_all
-        ReadMark.transaction do
-          ReadMark.delete_all :readable_type => self.base_class.name
-
-          ReadMark.reader_classes.each do |reader_class|
-            # Build a SELECT statement with all relevant readers
-            reader_sql = reader_class.reader_scope.
-                           select("#{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key},
-                                  '#{reader_class.base_class}',
-                                  '#{self.base_class.name}',
-                                  '#{connection.quoted_date Time.current}'").to_sql
-
-            ReadMark.connection.execute <<-EOT
-              INSERT INTO read_marks (reader_id, reader_type, readable_type, timestamp)
-              #{reader_sql}
-            EOT
-          end
-        end
-      end
-
       def reset_read_marks_for_user(reader)
         assert_reader(reader)
 

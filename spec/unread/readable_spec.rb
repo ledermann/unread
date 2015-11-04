@@ -310,23 +310,6 @@ describe Unread::Readable do
     end
   end
 
-  describe :reset_read_marks_for_all do
-    before :each do
-      Email.reset_read_marks_for_all
-    end
-
-    it "should reset read marks" do
-      expect(ReadMark.single.count).to eq 0
-      expect(ReadMark.global.count).to eq 3
-    end
-
-    it "should handle STI" do
-      expect(@reader.      read_mark_global(Email)).to be_a(ReadMark)
-      expect(@other_reader.read_mark_global(Email)).to be_a(ReadMark)
-      expect(@sti_reader.  read_mark_global(Email)).to be_a(ReadMark)
-    end
-  end
-
   describe :cleanup_read_marks! do
     it "should run garbage collector" do
       expect(Unread::GarbageCollector).to receive(:new).with(Email).and_return(double :run! => true)
