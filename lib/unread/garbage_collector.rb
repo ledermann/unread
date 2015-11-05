@@ -30,7 +30,7 @@ module Unread
         reader_scope.
         joins(:read_marks).
         where(:read_marks => { :readable_type => readable_class.base_class.name }).
-        group('read_marks.reader_type, read_marks.reader_id').
+        group('read_marks.reader_type, read_marks.reader_id, ' + reader_class.base_class.name.pluralize + '.id').
         having('COUNT(read_marks.id) > 1')
     end
 
