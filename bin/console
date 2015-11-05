@@ -20,7 +20,7 @@ require 'spec/app/models/email'
 # Pry.start
 
 ActiveRecord::Base.configurations = YAML.load_file('spec/database.yml')
-ActiveRecord::Base.establish_connection(:sqlite)
+ActiveRecord::Base.establish_connection((ENV['DB'] || 'sqlite').to_sym)
 ActiveRecord::Migration.verbose = false
 
 UnreadMigration.up
