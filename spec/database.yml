@@ -6,3 +6,7 @@ mysql:
   database: unread_test
   username: root
   encoding: utf8
+postgres:
+  adapter: postgresql
+  database: unread_test
+  username: postgres
