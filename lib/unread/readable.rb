@@ -59,14 +59,8 @@ module Unread
         assert_reader(reader)
 
         ReadMark.transaction do
-          ReadMark.delete_all :readable_type => self.base_class.name, :reader_id => reader.id, :reader_type => reader.class.base_class.name
-
-          ReadMark.create! do |rm|
-            rm.readable_type = self.base_class.name
-            rm.reader_id     = reader.id
-            rm.reader_type   = reader.class.base_class.name
-            rm.timestamp     = Time.current
-          end
+          reader.read_marks.where(:readable_type => self.base_class).delete_all
+          reader.read_marks.create! :readable_type => self.base_class, :timestamp => Time.current
         end
 
         reader.forget_memoized_read_mark_global
