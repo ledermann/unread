@@ -27,4 +27,5 @@ UnreadMigration.up
 SpecMigration.up
 
 require 'irb'
+require 'irb/completion'
 IRB.start
