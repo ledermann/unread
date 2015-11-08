@@ -26,6 +26,8 @@ ActiveRecord::Migration.verbose = false
 UnreadMigration.up
 SpecMigration.up
 
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+
 require 'irb'
 require 'irb/completion'
 IRB.start
