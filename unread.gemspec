@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mysql2', '~> 0.3.13'
   s.add_development_dependency 'pg'
   s.add_development_dependency 'rspec'
-  s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'coveralls', '>= 0.8.0'
+  s.add_development_dependency 'simplecov', '~> 0.11.0'
+  s.add_development_dependency 'coveralls'
   s.add_development_dependency 'appraisal'
 end
