@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 4.1.13"
+gem "activerecord", "~> 4.1.14"
+gem "mysql2", "~> 0.3.13"
 
 gemspec :path => "../"
