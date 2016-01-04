@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/ledermann/unread"
   s.summary     = %q{Manages read/unread status of ActiveRecord objects}
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
-  s.required_ruby_version = '>= 2.0.0'
+  s.required_ruby_version = '>= 1.9.3'
 
   s.rubyforge_project = "unread"
 
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'activerecord', '>= 4'
+  s.add_dependency 'activerecord', '>= 3'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'timecop'

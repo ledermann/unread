@@ -1,5 +1,6 @@
 language: ruby
 rvm:
+  - 1.9.3
   - 2.0.0
   - 2.1.8
   - 2.2.4
@@ -9,12 +10,23 @@ gemfile:
   - gemfiles/rails_4_2.gemfile
   - gemfiles/rails_4_1.gemfile
   - gemfiles/rails_4_0.gemfile
+  - gemfiles/rails_3_2.gemfile
+  - gemfiles/rails_3_1.gemfile
+  - gemfiles/rails_3_0.gemfile
 matrix:
   exclude:
+    - rvm: 1.9.3
+      gemfile: gemfiles/rails_5_0.gemfile
     - rvm: 2.0.0
       gemfile: gemfiles/rails_5_0.gemfile
     - rvm: 2.1.8
       gemfile: gemfiles/rails_5_0.gemfile
+    - rvm: 2.3.0
+      gemfile: gemfiles/rails_3_0.gemfile
+    - rvm: 2.3.0
+      gemfile: gemfiles/rails_3_1.gemfile
+    - rvm: 2.3.0
+      gemfile: gemfiles/rails_3_2.gemfile
 before_install: gem update bundler
 sudo: false
 env:
