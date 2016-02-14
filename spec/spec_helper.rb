@@ -15,7 +15,9 @@ require 'generators/unread/migration/templates/migration.rb'
 
 require 'app/models/reader'
 require 'app/models/different_reader'
+require 'app/models/customer'
 require 'app/models/sti_reader'
+require 'app/models/document'
 require 'app/models/email'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
