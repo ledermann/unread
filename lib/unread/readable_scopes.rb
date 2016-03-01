@@ -5,7 +5,7 @@ module Unread
         assert_reader(reader)
 
         joins "LEFT JOIN read_marks
-                ON read_marks.readable_type  = '#{base_class.name}'
+                ON read_marks.readable_type  = '#{readable_parent.name}'
                AND read_marks.readable_id    = #{quoted_table_name}.#{quoted_primary_key}
                AND read_marks.reader_id      = #{quote_bound_value(reader.id)}
                AND read_marks.reader_type    = #{quote_bound_value(reader.class.base_class.name)}

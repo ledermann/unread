@@ -1,7 +1,7 @@
 module Unread
   class GarbageCollector
     def initialize(readable_class)
-      @readable_class = readable_class
+      @readable_class = readable_class.readable_parent
     end
     attr_reader :readable_class
 
@@ -29,7 +29,7 @@ module Unread
       reader_class.
         reader_scope.
         joins(:read_marks).
-        where(:read_marks => { :readable_type => readable_class.base_class.name }).
+        where(:read_marks => { :readable_type => readable_class.name }).
         group("read_marks.reader_type, read_marks.reader_id, #{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key}").
         having('COUNT(read_marks.id) > 1')
     end
@@ -38,14 +38,14 @@ module Unread
       ReadMark.transaction do
         # Delete markers OLDER than the given timestamp
         reader.read_marks.
-          where(:readable_type => readable_class.base_class.name).
+          where(:readable_type => readable_class.name).
           single.
           older_than(timestamp).
           delete_all
 
         # Change the global timestamp for this reader
         rm = reader.read_mark_global(readable_class) || reader.read_marks.build
-        rm.readable_type = readable_class.base_class.name
+        rm.readable_type = readable_class.name
         rm.timestamp     = timestamp - 1.second
         rm.save!
       end
