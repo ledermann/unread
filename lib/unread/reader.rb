@@ -15,7 +15,8 @@ module Unread
     module InstanceMethods
       def read_mark_global(klass)
         @read_mark_global ||= {}
-        @read_mark_global[klass] ||= read_marks.where(:readable_type => klass.base_class.name).global.first
+        readable_klass = klass.readable_parent
+        @read_mark_global[readable_klass] ||= read_marks.where(:readable_type => readable_klass.name).global.first
       end
 
       def forget_memoized_read_mark_global
@@ -32,9 +33,9 @@ module Unread
       end
 
       private
-
+      
       def read_mark_id_belongs_to?(readable)
-        self.read_mark_readable_type == readable.class.base_class.name &&
+        self.read_mark_readable_type == readable.class.name &&
         (self.read_mark_readable_id.nil? || self.read_mark_readable_id.to_i == readable.id)
       end
 
