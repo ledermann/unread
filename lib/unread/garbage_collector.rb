@@ -29,9 +29,9 @@ module Unread
       reader_class.
         reader_scope.
         joins(:read_marks).
-        where(:read_marks => { :readable_type => readable_class.name }).
-        group("read_marks.reader_type, read_marks.reader_id, #{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key}").
-        having('COUNT(read_marks.id) > 1')
+        where(ReadMark.table_name => { :readable_type => readable_class.name }).
+        group("#{ReadMark.quoted_table_name}.reader_type, #{ReadMark.quoted_table_name}.reader_id, #{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key}").
+        having("COUNT(#{ReadMark.quoted_table_name}.id) > 1")
     end
 
     def update_read_marks_for_user(reader, timestamp)

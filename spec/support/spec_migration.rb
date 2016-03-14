@@ -1,18 +1,18 @@
 class SpecMigration < ActiveRecord::Migration
   def self.up
-    create_table :readers, :primary_key => 'number', :force => true do |t|
+    create_table Reader, :primary_key => 'number', :force => true do |t|
       t.string :name
     end
 
-    create_table :different_readers, :primary_key => 'number', :force => true do |t|
+    create_table DifferentReader, :primary_key => 'number', :force => true do |t|
       t.string :name
     end
 
-    create_table :customers, :force => true do |t|
+    create_table Customer, :force => true do |t|
       t.string :type
     end
 
-    create_table :documents, :primary_key => 'uid', :force => true do |t|
+    create_table Document, :primary_key => 'uid', :force => true do |t|
       t.string :type
       t.string :subject
       t.text :content

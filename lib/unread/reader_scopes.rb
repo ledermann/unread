@@ -10,24 +10,25 @@ module Unread
       def join_read_marks(readable)
         assert_readable(readable)
 
-        joins "LEFT JOIN read_marks
-                ON read_marks.readable_type  = '#{readable.class.readable_parent.name}'
-               AND (read_marks.readable_id   = #{readable.id} OR read_marks.readable_id IS NULL)
-               AND read_marks.reader_id      = #{quoted_table_name}.#{quoted_primary_key}
-               AND read_marks.reader_type    = '#{connection.quote_string base_class.name}'
-               AND read_marks.timestamp     >= '#{connection.quoted_date readable.send(readable.class.readable_options[:on])}'"
+        joins "LEFT JOIN #{ReadMark.quoted_table_name}
+                ON #{ReadMark.quoted_table_name}.readable_type  = '#{readable.class.readable_parent.name}'
+               AND (#{ReadMark.quoted_table_name}.readable_id   = #{readable.id} OR #{ReadMark.quoted_table_name}.readable_id IS NULL)
+               AND #{ReadMark.quoted_table_name}.reader_id      = #{quoted_table_name}.#{quoted_primary_key}
+               AND #{ReadMark.quoted_table_name}.reader_type    = '#{connection.quote_string base_class.name}'
+               AND #{ReadMark.quoted_table_name}.timestamp     >= '#{connection.quoted_date readable.send(readable.class.readable_options[:on])}'"
       end
 
       def have_not_read(readable)
-        join_read_marks(readable).where('read_marks.id IS NULL')
+        join_read_marks(readable).where("#{ReadMark.quoted_table_name}.id IS NULL")
       end
 
       def have_read(readable)
-        join_read_marks(readable).where('read_marks.id IS NOT NULL')
+        join_read_marks(readable).where("#{ReadMark.quoted_table_name}.id IS NOT NULL")
       end
 
       def with_read_marks_for(readable)
-        join_read_marks(readable).select("#{quoted_table_name}.*, read_marks.id AS read_mark_id,
+        join_read_marks(readable).select("#{quoted_table_name}.*,
+                                          #{ReadMark.quoted_table_name}.id AS read_mark_id,
                                          '#{readable.class.name}' AS read_mark_readable_type,
                                           #{readable.id} AS read_mark_readable_id")
       end
