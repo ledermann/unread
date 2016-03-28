@@ -68,7 +68,10 @@ module Unread
 
         ReadMark.transaction do
           reader.read_marks.where(:readable_type => self.readable_parent.name).delete_all
-          reader.read_marks.create! :readable_type => self.readable_parent.name, :timestamp => Time.current
+          rm = reader.read_marks.new
+          rm.readable_type = self.readable_parent.name
+          rm.timestamp = Time.current
+          rm.create!
         end
 
         reader.forget_memoized_read_mark_global
