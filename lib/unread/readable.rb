@@ -57,7 +57,7 @@ module Unread
         end
         current_klass
       end
-      
+
       def cleanup_read_marks!
         assert_reader_class
         Unread::GarbageCollector.new(self).run!
@@ -68,7 +68,10 @@ module Unread
 
         ReadMark.transaction do
           reader.read_marks.where(:readable_type => self.readable_parent.name).delete_all
-          reader.read_marks.create! :readable_type => self.readable_parent.name, :timestamp => Time.current
+          rm = reader.read_marks.new
+          rm.readable_type = self.readable_parent.name
+          rm.timestamp = Time.current
+          rm.save!    
         end
 
         reader.forget_memoized_read_mark_global
