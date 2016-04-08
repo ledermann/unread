@@ -9,7 +9,9 @@ require 'spec/support/spec_migration.rb'
 
 require 'spec/app/models/reader'
 require 'spec/app/models/different_reader'
+require 'spec/app/models/customer'
 require 'spec/app/models/sti_reader'
+require 'spec/app/models/document'
 require 'spec/app/models/email'
 
 # You can add fixtures and/or initialization code here to make experimenting
