@@ -27,11 +27,18 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              rm = obj.read_marks.where(:reader_id => reader.id, :reader_type => reader.class.base_class.name).first || obj.read_marks.build
-              rm.reader_id   = reader.id
-              rm.reader_type = reader.class.base_class.name
-              rm.timestamp   = timestamp
-              rm.save!
+              # This transaction is needed, so that parent transaction won't rollback even there's an error.
+              ReadMark.transaction(requires_new: true) do
+                begin
+                  rm = obj.read_marks.where(reader_id: reader.id, reader_type: reader.class.base_class.name).first || obj.read_marks.build
+                  rm.reader_id   = reader.id
+                  rm.reader_type = reader.class.base_class.name
+                  rm.timestamp   = timestamp
+                  rm.save!
+                rescue ActiveRecord::RecordNotUnique
+                  raise ActiveRecord::Rollback
+                end
+              end
             end
           end
         end
