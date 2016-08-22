@@ -266,6 +266,20 @@ describe Unread::Readable do
       expect(@email2.unread?(@reader)).to be_falsey
     end
 
+    it "should mark the rest as read when the first record is not unique" do
+      Email.mark_as_read! [ @email1 ], for: @reader
+
+      allow(@email1).to receive_message_chain("read_marks.build").and_return(@email1.read_marks.build)
+      allow(@email1).to receive_message_chain("read_marks.where").and_return([])
+
+      expect do
+        Email.mark_as_read! [ @email1, @email2 ], for: @reader
+      end.to change(ReadMark, :count).by(1)
+
+      expect(@email1.unread?(@reader)).to be_falsey
+      expect(@email2.unread?(@reader)).to be_falsey
+    end
+
     it "should perform less queries if the objects are already read" do
       Email.mark_as_read! :all, :for => @reader
 
