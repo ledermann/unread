@@ -27,9 +27,10 @@ module Unread
       end
 
       def with_read_marks_for(readable)
+        postgresql_string_cast = connection.adapter_name.downcase.to_sym == :postgresql ? "::text" : ""
         join_read_marks(readable).select("#{quoted_table_name}.*,
                                           #{ReadMark.quoted_table_name}.id AS read_mark_id,
-                                         '#{readable.class.name}' AS read_mark_readable_type,
+                                         '#{readable.class.name}'#{postgresql_string_cast} AS read_mark_readable_type,
                                           #{readable.id} AS read_mark_readable_id")
       end
     end
