@@ -78,7 +78,7 @@ module Unread
           rm = reader.read_marks.new
           rm.readable_type = self.readable_parent.name
           rm.timestamp = Time.current
-          rm.save!    
+          rm.save!
         end
 
         reader.forget_memoized_read_mark_global
