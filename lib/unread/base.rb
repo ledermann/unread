@@ -36,5 +36,9 @@ module Unread
       extend Readable::ClassMethods
       extend Readable::Scopes
     end
+
+    def using_postgresql?
+      connection.adapter_name.match(/postgres/i)
+    end
   end
 end
