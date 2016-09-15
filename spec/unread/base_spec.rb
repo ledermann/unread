@@ -27,6 +27,14 @@ describe Unread::Base do
         rm2 = @reader.read_mark_global(Email)
       }.to perform_queries(1)
     end
+
+    it "should be idempotent" do
+      expect {
+        Reader.acts_as_reader
+        Reader.acts_as_reader
+        Reader.acts_as_reader
+      }.to_not change { ReadMark.reader_classes }
+    end
   end
 
   describe :acts_as_readable do
@@ -40,6 +48,14 @@ describe Unread::Base do
 
     it "should use default options" do
       expect(Email.readable_options).to eq({ :on => :updated_at })
+    end
+
+    it "should be idempotent" do
+      expect {
+        Document.acts_as_readable
+        Document.acts_as_readable
+        Document.acts_as_readable
+      }.to_not change { ReadMark.readable_classes }
     end
   end
 end
