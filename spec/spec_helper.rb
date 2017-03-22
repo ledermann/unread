@@ -19,6 +19,7 @@ require 'app/models/customer'
 require 'app/models/sti_reader'
 require 'app/models/document'
 require 'app/models/email'
+require 'app/models/multi_level_sti_readable'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
