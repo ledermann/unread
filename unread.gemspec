@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/ledermann/unread"
   s.summary     = %q{Manages read/unread status of ActiveRecord objects}
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
-  s.required_ruby_version = '>= 1.9.3'
+  s.required_ruby_version = '>= 2.0.0'
 
   s.rubyforge_project = "unread"
 
@@ -26,10 +26,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'mysql2'
-  s.add_development_dependency 'pg', RUBY_VERSION < '2' ? '< 0.19.0' : nil
+  s.add_development_dependency 'pg'
   s.add_development_dependency 'rspec'
-  s.add_development_dependency 'simplecov', RUBY_VERSION < '2' ? '~> 0.11.2' : '>= 0.11.2'
-  s.add_development_dependency 'term-ansicolor', '< 1.4' if RUBY_VERSION < '2'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'term-ansicolor'
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'appraisal'
 end
