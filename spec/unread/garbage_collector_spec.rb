@@ -8,7 +8,7 @@ describe Unread::GarbageCollector do
     wait
     @email1 = Email.create!
     wait
-    @email2 = Email.create!
+    @email2 = MultiLevelStiReadable.create!
   end
 
   describe :run! do

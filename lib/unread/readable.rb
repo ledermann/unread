@@ -58,11 +58,7 @@ module Unread
       end
 
       def readable_parent
-        current_klass = self
-        while(ReadMark.readable_classes.include?(current_klass.superclass)) do
-          current_klass = current_klass.superclass
-        end
-        current_klass
+        self.ancestors.find { |ancestor| ReadMark.readable_classes.include?(ancestor) }
       end
 
       def cleanup_read_marks!
