@@ -1,4 +1,4 @@
-class UnreadPolymorphicReaderMigration < ActiveRecord::Migration
+class UnreadPolymorphicReaderMigration < Unread::MIGRATION_BASE_CLASS
   def self.up
     remove_index :read_marks, [:user_id, :readable_type, :readable_id]
     rename_column :read_marks, :user_id, :reader_id

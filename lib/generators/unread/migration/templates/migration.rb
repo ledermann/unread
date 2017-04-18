@@ -1,4 +1,4 @@
-class UnreadMigration < ActiveRecord::Migration
+class UnreadMigration < Unread::MIGRATION_BASE_CLASS
   def self.up
     create_table ReadMark, force: true do |t|
       t.references :readable, polymorphic: { null: false }
