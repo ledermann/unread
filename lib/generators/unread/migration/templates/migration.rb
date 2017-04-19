@@ -13,7 +13,7 @@ class UnreadMigration < Unread::MIGRATION_BASE_CLASS
     drop_table ReadMark
   end
 
-  def create_options
+  def self.create_options
     options = ''
     if defined?(ActiveRecord::ConnectionAdapters::Mysql2Adapter) \
       && ActiveRecord::Base.connection.instance_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
