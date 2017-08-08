@@ -324,6 +324,45 @@ describe Unread::Readable do
     end
   end
 
+  describe :read_at do
+    it "should set read_at" do
+      @email1.mark_as_read! :for => @reader
+      expect(@email1.read_at(@reader)).to eq @email1.read_mark(@reader).read_at
+    end
+
+    it "should handle updating object" do
+      @email1.mark_as_read! :for => @reader
+      old_read_at = @email1.read_mark(@reader).read_at
+      expect(@email1.read_at(@reader)).to eq old_read_at
+      expect(@email1.read_at(@reader)).to be_within(0.1).of Time.current
+
+      wait
+
+      @email1.update_attributes! :subject => 'changed'
+      expect(@email1.read_at(@reader)).to eq nil
+
+      wait
+
+      @email1.mark_as_read! :for => @reader
+      expect(@email1.read_at(@reader)).to eq @email1.read_mark(@reader).read_at
+      expect(@email1.read_at(@reader)).not_to eq old_read_at
+      expect(@email1.read_at(@reader)).to be_within(0.1).of Time.current
+    end
+
+    it "should raise error for invalid argument" do
+      expect {
+        @email1.read_at(42)
+      }.to raise_error(ArgumentError)
+    end
+
+    it "should work without any read_marks" do
+      ReadMark.delete_all
+
+      expect(@email1.read_at(@reader)).to eq nil
+      expect(@email2.read_at(@reader)).to eq nil
+    end
+  end
+
   describe :cleanup_read_marks! do
     it "should run garbage collector" do
       expect(Unread::GarbageCollector).to receive(:new).with(Email).and_return(double :run! => true)

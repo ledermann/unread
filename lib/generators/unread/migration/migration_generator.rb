@@ -10,6 +10,8 @@ module Unread
 
     def create_migration_file
       migration_template 'migration.rb', 'db/migrate/unread_migration.rb'
+      migration_template 'add_read_at_to_read_mark.rb',
+                         'db/migrate/add_read_at_to_read_mark.rb'
     end
 
     def self.next_migration_number(dirname)
