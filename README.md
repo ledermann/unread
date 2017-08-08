@@ -145,6 +145,9 @@ users[0].have_read?(message1)
 users[1].have_read?(message2)
 # => false
 
+## Get read marks for a user
+message1.read_mark(current_user)
+
 # Optional: Cleaning up unneeded markers
 # Do this in a cron job once a day
 Message.cleanup_read_marks!
