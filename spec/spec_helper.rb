@@ -48,6 +48,7 @@ RSpec.configure do |config|
   end
 
   config.after :suite do
+    AddReadAtToReadMark.down
     UnreadMigration.down
   end
 end
