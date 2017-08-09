@@ -145,6 +145,10 @@ users[0].have_read?(message1)
 users[1].have_read?(message2)
 # => false
 
+## Get when a user read the message
+message1.read_at(current_user)
+# => 2017-08-08 18:22:10 UTC
+
 # Optional: Cleaning up unneeded markers
 # Do this in a cron job once a day
 Message.cleanup_read_marks!

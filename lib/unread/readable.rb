@@ -115,6 +115,7 @@ module Unread
         ReadMark.transaction do
           if unread?(reader)
             rm = read_mark(reader) || read_marks.build
+            rm.read_at     = Time.current
             rm.reader_id   = reader.id
             rm.reader_type = reader.class.base_class.name
             rm.timestamp   = self.send(readable_options[:on])
@@ -124,7 +125,12 @@ module Unread
       end
 
       def read_mark(reader)
+        self.class.assert_reader(reader)
         read_marks.where(:reader_id => reader.id, reader_type: reader.class.base_class.name).first
+      end
+
+      def read_at(reader)
+        unread?(reader) ? nil : read_mark(reader).read_at
       end
 
       private

@@ -12,6 +12,7 @@ end
 require 'timecop'
 require 'unread'
 require 'generators/unread/migration/templates/migration.rb'
+require 'generators/unread/migration/templates/add_read_at_to_read_mark.rb'
 
 require 'app/models/reader'
 require 'app/models/different_reader'
@@ -47,6 +48,7 @@ RSpec.configure do |config|
   end
 
   config.after :suite do
+    AddReadAtToReadMark.down
     UnreadMigration.down
   end
 end
@@ -68,6 +70,7 @@ def setup_db
   ActiveRecord::Migration.verbose = false
 
   UnreadMigration.up
+  AddReadAtToReadMark.up
   SpecMigration.up
 end
 
