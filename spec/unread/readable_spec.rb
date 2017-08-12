@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Unread::Readable do
   before :each do
-    @reader = Reader.create! :name => 'David'
-    @other_reader = Reader.create :name => 'Matz'
+    @reader = Reader.create! name: 'David'
+    @other_reader = Reader.create name: 'Matz'
     @sti_reader = StiReader.create!
     wait
     @email1 = Email.create!
@@ -18,7 +18,7 @@ describe Unread::Readable do
     end
 
     it "should return unread records" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Email.unread_by(@reader)).to eq [@email2]
       expect(Email.unread_by(@reader).count).to eq 1
@@ -27,7 +27,7 @@ describe Unread::Readable do
     end
 
     it "should return empty array directly after marking all as read" do
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
       expect(Email.unread_by(@reader)).to eq([])
     end
 
@@ -58,7 +58,7 @@ describe Unread::Readable do
       end
 
       it "should return unread records" do
-        @email1.mark_as_read! :for => @reader
+        @email1.mark_as_read! for: @reader
 
         expect(Email.unread_by(@reader)).to eq [@email2]
         expect(Email.unread_by(@reader).count).to eq 1
@@ -89,14 +89,14 @@ describe Unread::Readable do
     end
 
     it "should return read records" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Email.read_by(@reader)).to eq [@email1]
       expect(Email.read_by(@reader).count).to eq 1
     end
 
     it "should return all records when all read" do
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
 
       expect(Email.read_by(@reader)).to eq [@email1, @email2]
     end
@@ -128,14 +128,14 @@ describe Unread::Readable do
       end
 
       it "should return read records" do
-        @email1.mark_as_read! :for => @reader
+        @email1.mark_as_read! for: @reader
 
         expect(Email.read_by(@reader)).to eq [@email1]
         expect(Email.read_by(@reader).count).to eq 1
       end
 
       it "should return all records when all read" do
-        Email.mark_as_read! :all, :for => @reader
+        Email.mark_as_read! :all, for: @reader
 
         expect(Email.read_by(@reader)).to eq [@email1, @email2]
       end
@@ -191,11 +191,11 @@ describe Unread::Readable do
     end
 
     it "should handle updating object" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
       wait
       expect(@email1.unread?(@reader)).to be_falsey
 
-      @email1.update_attributes! :subject => 'changed'
+      @email1.update_attributes! subject: 'changed'
       expect(@email1.unread?(@reader)).to be_truthy
     end
 
@@ -206,7 +206,7 @@ describe Unread::Readable do
     end
 
     it "should work with eager-loaded read marks" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect {
         emails = Email.with_read_marks_for(@reader).to_a
@@ -225,7 +225,7 @@ describe Unread::Readable do
     end
 
     it "should work with eager-loaded read marks for the correct reader" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       emails = Email.with_read_marks_for(@reader).to_a
       expect(emails[0].unread?(@reader)).to be_falsey
@@ -235,7 +235,7 @@ describe Unread::Readable do
 
   describe '#mark_as_read!' do
     it "should mark a single object as read" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(@email1.unread?(@reader)).to be_falsey
       expect(Email.unread_by(@reader)).to eq [@email2]
@@ -248,8 +248,8 @@ describe Unread::Readable do
     end
 
     it "should be idempotent" do
-      @email1.mark_as_read! :for => @reader
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
+      @email1.mark_as_read! for: @reader
 
       expect(@reader.read_marks.single.count).to eq 1
     end
@@ -260,7 +260,7 @@ describe Unread::Readable do
       expect(@email1.unread?(@reader)).to be_truthy
       expect(@email2.unread?(@reader)).to be_truthy
 
-      Email.mark_as_read! [ @email1, @email2 ], :for => @reader
+      Email.mark_as_read! [ @email1, @email2 ], for: @reader
 
       expect(@email1.unread?(@reader)).to be_falsey
       expect(@email2.unread?(@reader)).to be_falsey
@@ -281,15 +281,15 @@ describe Unread::Readable do
     end
 
     it "should perform less queries if the objects are already read" do
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
 
       expect {
-        Email.mark_as_read! [ @email1, @email2 ], :for => @reader
+        Email.mark_as_read! [ @email1, @email2 ], for: @reader
       }.to perform_queries(1)
     end
 
     it "should mark all objects as read" do
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
 
       expect(@reader.read_mark_global(Email).timestamp).to eq Time.current
       expect(@reader.read_marks.single).to eq []
@@ -300,8 +300,8 @@ describe Unread::Readable do
     it "should mark all objects as read with existing read objects" do
       wait
 
-      Email.mark_as_read! :all, :for => @reader
-      @email1.mark_as_read! :for => @reader
+      Email.mark_as_read! :all, for: @reader
+      @email1.mark_as_read! for: @reader
 
       expect(@reader.read_marks.single).to eq []
     end
@@ -309,13 +309,13 @@ describe Unread::Readable do
     it "should reset memoized global read mark" do
       rm_global = @reader.read_mark_global(Email)
 
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
       expect(@reader.read_mark_global(Email)).not_to eq(rm_global)
     end
 
     it "should not allow invalid arguments" do
       expect {
-        Email.mark_as_read! :foo, :for => @reader
+        Email.mark_as_read! :foo, for: @reader
       }.to raise_error(ArgumentError)
 
       expect {

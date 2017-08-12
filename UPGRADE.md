@@ -11,7 +11,7 @@ The gem accepts any type of classes as reader and it's not limited to `User` cla
 
 ```ruby
 Customer.have_not_read(message1)
-message1.mark_as_read! :for => Customer.find(1)
+message1.mark_as_read! for: Customer.find(1)
 ```
 
 If you are upgrading from v0.6.3 or older, you need to do the following after upgrading:
@@ -32,7 +32,7 @@ The class method `acts_as_reader` doesn't take the option `:scope` anymore. If y
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_reader :scope => -> { where(:is_admin => true) }
+  acts_as_reader scope: -> { where(is_admin: true) }
 end
 ```
 
@@ -43,7 +43,7 @@ class User < ActiveRecord::Base
   acts_as_reader
 
   def self.reader_scope
-    where(:is_admin => true)
+    where(is_admin: true)
   end
 end
 ```

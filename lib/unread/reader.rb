@@ -16,7 +16,7 @@ module Unread
       def read_mark_global(klass)
         @read_mark_global ||= {}
         readable_klass = klass.readable_parent
-        @read_mark_global[readable_klass] ||= read_marks.where(:readable_type => readable_klass.name).global.first
+        @read_mark_global[readable_klass] ||= read_marks.where(readable_type: readable_klass.name).global.first
       end
 
       def forget_memoized_read_mark_global
@@ -44,7 +44,7 @@ module Unread
       # If you don't want this, you can override this method in your reader class
       def setup_new_reader
         (ReadMark.readable_classes || []).each do |klass|
-          klass.mark_as_read! :all, :for => self
+          klass.mark_as_read! :all, for: self
         end
       end
     end

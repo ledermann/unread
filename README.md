@@ -65,12 +65,12 @@ class User < ActiveRecord::Base
 
   # Optional: Allow a subset of users as readers only
   def self.reader_scope
-    where(:is_admin => true)
+    where(is_admin: true)
   end
 end
 
 class Message < ActiveRecord::Base
-  acts_as_readable :on => :created_at
+  acts_as_readable on: :created_at
 end
 
 message1 = Message.create!
@@ -80,7 +80,7 @@ message2 = Message.create!
 Message.unread_by(current_user)
 # => [ message1, message2 ]
 
-message1.mark_as_read! :for => current_user
+message1.mark_as_read! for: current_user
 Message.unread_by(current_user)
 # => [ message2 ]
 
@@ -88,7 +88,7 @@ Message.unread_by(current_user)
 Message.read_by(current_user)
 # => [ ]
 
-message1.mark_as_read! :for => current_user
+message1.mark_as_read! for: current_user
 Message.read_by(current_user)
 # => [ message1 ]
 
@@ -100,7 +100,7 @@ messages[0].unread?(current_user)
 messages[1].unread?(current_user)
 # => true
 
-Message.mark_as_read! :all, :for => current_user
+Message.mark_as_read! :all, for: current_user
 Message.unread_by(current_user)
 # => [ ]
 
@@ -114,7 +114,7 @@ user2 = User.create!
 User.have_not_read(message1)
 # => [ user1, user2 ]
 
-message1.mark_as_read! :for => user1
+message1.mark_as_read! for: user1
 User.have_not_read(message1)
 # => [ user2 ]
 
@@ -122,11 +122,11 @@ User.have_not_read(message1)
 User.have_read(message1)
 # => [ user1 ]
 
-message1.mark_as_read! :for => user2
+message1.mark_as_read! for: user2
 User.have_read(message1)
 # => [ user1, user2 ]
 
-Message.mark_as_read! :all, :for => user1
+Message.mark_as_read! :all, for: user1
 User.have_not_read(message1)
 # => [ ]
 User.have_not_read(message2)

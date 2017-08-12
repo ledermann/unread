@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe Unread::Reader do
   before :each do
-    @reader = Reader.create! :name => 'David'
-    @other_reader = Reader.create :name => 'Matz'
-    @different_reader = DifferentReader.create! :name => 'Behrooz', :number => @reader.number
+    @reader = Reader.create! name: 'David'
+    @other_reader = Reader.create name: 'Matz'
+    @different_reader = DifferentReader.create! name: 'Behrooz', number: @reader.number
     wait
     @email1 = Email.create!
     wait
@@ -18,7 +18,7 @@ describe Unread::Reader do
     end
 
     it "should return *only* the readers that have not read a given object" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Reader.have_not_read(@email1)).to eq [@other_reader]
       expect(Reader.have_not_read(@email1).count).to eq 1
@@ -30,7 +30,7 @@ describe Unread::Reader do
       # even though the id of @reader and @different_reader is the same because
       # they are different object types, the @email1 should only be marked as
       # read for @reader.
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Reader.have_not_read(@email1)).to eq [@other_reader]
       expect(Reader.have_not_read(@email1).count).to eq 1
@@ -38,7 +38,7 @@ describe Unread::Reader do
       expect(DifferentReader.have_not_read(@email1)).to eq [@different_reader]
       expect(DifferentReader.have_not_read(@email1).count).to eq 1
 
-      @email1.mark_as_read! :for => @different_reader
+      @email1.mark_as_read! for: @different_reader
 
       expect(DifferentReader.have_not_read(@email1).count).to eq 0
 
@@ -69,7 +69,7 @@ describe Unread::Reader do
     end
 
     it "should return *only* the readers that have read the given object" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Reader.have_read(@email1)).to eq [@reader]
       expect(Reader.have_read(@email1).count).to eq 1
@@ -78,7 +78,7 @@ describe Unread::Reader do
     end
 
     it "should return the reader for all the object when all read" do
-      Email.mark_as_read! :all, :for => @reader
+      Email.mark_as_read! :all, for: @reader
 
       expect(Reader.have_read(@email1)).to eq [@reader]
       expect(Reader.have_read(@email1).count).to eq 1
@@ -145,11 +145,11 @@ describe Unread::Reader do
     end
 
     it "should handle updating object" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
       wait
       expect(@reader.have_read?(@email1)).to be_truthy
 
-      @email1.update_attributes! :subject => 'changed'
+      @email1.update_attributes! subject: 'changed'
       expect(@reader.have_read?(@email1)).to be_falsey
     end
 
@@ -160,7 +160,7 @@ describe Unread::Reader do
     end
 
     it "should work with eager-loaded read marks" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect {
         readers = Reader.with_read_marks_for(@email1).to_a
@@ -171,7 +171,7 @@ describe Unread::Reader do
     end
 
     it "should work with eager-loaded read marks for the correct readable" do
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       readers = Reader.with_read_marks_for(@email1).to_a
       expect(readers[0].have_read?(@email1)).to be_truthy

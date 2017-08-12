@@ -70,7 +70,7 @@ module Unread
         assert_reader(reader)
 
         ReadMark.transaction do
-          reader.read_marks.where(:readable_type => self.readable_parent.name).delete_all
+          reader.read_marks.where(readable_type: self.readable_parent.name).delete_all
           rm = reader.read_marks.new
           rm.readable_type = self.readable_parent.name
           rm.timestamp = Time.current
@@ -126,7 +126,7 @@ module Unread
       private
 
       def read_mark(reader)
-        read_marks.where(:reader_id => reader.id, reader_type: reader.class.base_class.name).first
+        read_marks.where(reader_id: reader.id, reader_type: reader.class.base_class.name).first
       end
 
       def read_mark_id_belongs_to?(reader)

@@ -8,9 +8,9 @@ module Unread
       ReadMark.reader_classes ||= []
 
       unless ReadMark.reader_classes.include?(self)
-        ReadMark.belongs_to :reader, :polymorphic => true, inverse_of: :read_marks
+        ReadMark.belongs_to :reader, polymorphic: true, inverse_of: :read_marks
 
-        has_many :read_marks, :dependent => :delete_all, as: :reader, :inverse_of => :reader
+        has_many :read_marks, dependent: :delete_all, as: :reader, inverse_of: :reader
 
         after_create :setup_new_reader
 
@@ -28,10 +28,10 @@ module Unread
       unless ReadMark.readable_classes.include?(self)
         class_attribute :readable_options
 
-        options.reverse_merge!(:on => :updated_at)
+        options.reverse_merge!(on: :updated_at)
         self.readable_options = options
 
-        has_many :read_marks, :as => :readable, :dependent => :delete_all, inverse_of: :readable
+        has_many :read_marks, as: :readable, dependent: :delete_all, inverse_of: :readable
 
         ReadMark.readable_classes << self
 

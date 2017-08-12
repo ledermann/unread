@@ -4,7 +4,7 @@ describe Unread::Base do
   before :each do
     @email = Email.create!
     wait
-    @reader = Reader.create! :name => 'John'
+    @reader = Reader.create! name: 'John'
   end
 
   describe :acts_as_reader do
@@ -47,7 +47,7 @@ describe Unread::Base do
     end
 
     it "should use default options" do
-      expect(Email.readable_options).to eq({ :on => :updated_at })
+      expect(Email.readable_options).to eq({ on: :updated_at })
     end
 
     it "should be idempotent" do

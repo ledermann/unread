@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Unread::GarbageCollector do
   before :each do
-    @reader = Reader.create! :name => 'David'
-    @other_reader = Reader.create :name => 'Matz'
+    @reader = Reader.create! name: 'David'
+    @other_reader = Reader.create name: 'Matz'
     @sti_reader = StiReader.create!
     wait
     @email1 = Email.create!
@@ -15,7 +15,7 @@ describe Unread::GarbageCollector do
     it "should delete all single read marks" do
       expect(@reader.read_marks.single.count).to eq 0
 
-      @email1.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
 
       expect(Email.unread_by(@reader)).to eq [@email2]
       expect(@reader.read_marks.single.count).to eq 1
@@ -27,8 +27,8 @@ describe Unread::GarbageCollector do
     end
 
     it "should reset if all objects are read" do
-      @email1.mark_as_read! :for => @reader
-      @email2.mark_as_read! :for => @reader
+      @email1.mark_as_read! for: @reader
+      @email2.mark_as_read! for: @reader
 
       expect(@reader.read_marks.single.count).to eq 2
 

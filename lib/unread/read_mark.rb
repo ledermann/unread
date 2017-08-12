@@ -1,9 +1,9 @@
 class ReadMark < ActiveRecord::Base
-  belongs_to :readable, :polymorphic => true
+  belongs_to :readable, polymorphic: true
 
   validates_presence_of :reader_id, :reader_type, :readable_type
 
-  scope :global, lambda { where(:readable_id => nil) }
+  scope :global, lambda { where(readable_id: nil) }
   scope :single, lambda { where('readable_id IS NOT NULL') }
   scope :older_than, lambda { |timestamp| where([ 'timestamp < ?', timestamp ]) }
 
