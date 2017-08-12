@@ -123,11 +123,11 @@ module Unread
         end
       end
 
+      private
+
       def read_mark(reader)
         read_marks.where(:reader_id => reader.id, reader_type: reader.class.base_class.name).first
       end
-
-      private
 
       def read_mark_id_belongs_to?(reader)
         self.read_mark_reader_id.to_i == reader.id &&
