@@ -71,6 +71,16 @@ end
 
 class Message < ActiveRecord::Base
   acts_as_readable on: :created_at
+
+  # The `on:` option sets the relevant attribute for comparing timestamps.
+  #
+  # The default is :updated_at, so updating a record, which was read by a
+  # reader makes it unread again.
+  #
+  # Using :created_at, only new records will show up as unread. Updating a
+  # record which was read by a reader, will NOT mark it as unread.
+  #
+  # Any other existing timestamp field can be used as `on:` option.
 end
 
 message1 = Message.create!
