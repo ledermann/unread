@@ -22,18 +22,3 @@ appraise "rails-4-0" do
   gem "activerecord", "~> 4.0.13"
   gem "mysql2", '~> 0.3.10'
 end
-
-appraise "rails-3-2" do
-  gem "activerecord", "~> 3.2.22"
-  gem 'mysql2', '~> 0.3.10'
-end
-
-appraise "rails-3-1" do
-  gem "activerecord", "~> 3.1.12"
-  gem 'mysql2', '~> 0.3.10'
-end
-
-appraise "rails-3-0" do
-  gem "activerecord", "~> 3.0.20"
-  gem "activerecord-mysql2-adapter"
-end
