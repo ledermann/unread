@@ -288,6 +288,14 @@ describe Unread::Readable do
       }.to perform_queries(1)
     end
 
+    it "should allow a collection of records to be marked as read" do
+      Email.mark_as_read! Email.all, for: @reader
+
+      expect(@email1.unread?(@reader)).to be_falsey
+      expect(@email2.unread?(@reader)).to be_falsey
+    end
+
+
     it "should mark all objects as read" do
       Email.mark_as_read! :all, for: @reader
 
