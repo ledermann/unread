@@ -10,13 +10,13 @@ module Unread
         if target == :all
           reset_read_marks_for_user(reader)
         elsif target.respond_to?(:each)
-          mark_array_as_read(target, reader)
+          mark_collection_as_read(target, reader)
         else
           raise ArgumentError
         end
       end
 
-      def mark_array_as_read(collection, reader)
+      def mark_collection_as_read(collection, reader)
         ReadMark.transaction do
           global_timestamp = reader.read_mark_global(self).try(:timestamp)
 
