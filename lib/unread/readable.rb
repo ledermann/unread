@@ -27,19 +27,32 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              # This transaction is needed, so that parent transaction won't rollback even there's an error.
-              ReadMark.transaction(requires_new: true) do
-                begin
-                  rm = obj.read_marks.where(reader_id: reader.id, reader_type: reader.class.base_class.name).first || obj.read_marks.build
-                  rm.reader_id   = reader.id
-                  rm.reader_type = reader.class.base_class.name
-                  rm.timestamp   = timestamp
-                  rm.save!
-                rescue ActiveRecord::RecordNotUnique
-                  raise ActiveRecord::Rollback
-                end
-              end
+              mark_collection_item_as_read(obj, reader)
             end
+          end
+        end
+      end
+
+      def mark_collection_item_as_read(obj, reader)
+        marking_proc = proc { |obj|
+          rm = obj.read_marks.find_or_initialize_by(reader: reader)
+          rm.timestamp = obj.send(readable_options[:on])
+          rm.save!
+        }
+
+        if using_postgresql?
+          ReadMark.transaction(requires_new: true) do
+            begin
+              marking_proc.call(obj)
+            rescue ActiveRecord::RecordNotUnique
+              raise ActiveRecord::Rollback
+            end
+          end
+        else
+          begin
+            marking_proc.call(obj)
+          rescue ActiveRecord::RecordNotUnique
+            # The object is explicitly marked as read, so there is nothing to do
           end
         end
       end
