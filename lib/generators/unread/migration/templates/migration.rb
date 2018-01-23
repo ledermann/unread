@@ -1,4 +1,8 @@
+require 'generators/unread/migration_helper'
+
 class UnreadMigration < Unread::MIGRATION_BASE_CLASS
+  extend Unread::Generators::MigrationHelper
+
   def self.up
     create_table ReadMark, force: true, options: create_options do |t|
       t.references :readable, polymorphic: { null: false }
@@ -6,7 +10,15 @@ class UnreadMigration < Unread::MIGRATION_BASE_CLASS
       t.datetime :timestamp
     end
 
-    add_index ReadMark, [:reader_id, :reader_type, :readable_type, :readable_id], name: 'read_marks_reader_readable_index', unique: true
+    index_name = 'read_marks_reader_readable_index'
+    add_index ReadMark, [:reader_id, :reader_type, :readable_type, :readable_id], name: index_name, unique: true
+
+    if postgresql_9_5?
+      execute <<-SQL
+        ALTER TABLE #{ReadMark.table_name}
+          ADD CONSTRAINT read_marks_reader_readable_constraint UNIQUE USING INDEX #{index_name}
+      SQL
+    end
   end
 
   def self.down
@@ -14,11 +26,6 @@ class UnreadMigration < Unread::MIGRATION_BASE_CLASS
   end
 
   def self.create_options
-    options = ''
-    if defined?(ActiveRecord::ConnectionAdapters::Mysql2Adapter) \
-      && ActiveRecord::Base.connection.instance_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
-      options = 'DEFAULT CHARSET=latin1'
-    end
-    options
+    mysql? ? 'DEFAULT CHARSET=latin1' : ''
   end
 end

@@ -21,12 +21,13 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'activerecord', '>= 3'
+  s.add_dependency 'upsert', '~> 2.2.1'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'mysql2'
-  s.add_development_dependency 'pg'
+  s.add_development_dependency 'pg', '< 1'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'term-ansicolor'
