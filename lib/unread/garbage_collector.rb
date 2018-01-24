@@ -7,7 +7,7 @@ module Unread
 
     def run!
       ReadMark.reader_classes.each do |reader_class|
-        readers_to_cleanup(reader_class).each do |reader|
+        readers_to_cleanup(reader_class).find_each do |reader|
           if oldest_timestamp = readable_class.read_scope(reader).
                                   unread_by(reader).
                                   minimum(readable_class.readable_options[:on])
@@ -31,7 +31,8 @@ module Unread
         joins(:read_marks).
         where(ReadMark.table_name => { readable_type: readable_class.name }).
         group("#{ReadMark.quoted_table_name}.reader_type, #{ReadMark.quoted_table_name}.reader_id, #{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key}").
-        having("COUNT(#{ReadMark.quoted_table_name}.id) > 1")
+        having("COUNT(#{ReadMark.quoted_table_name}.id) > 1").
+        select("#{reader_class.quoted_table_name}.#{reader_class.quoted_primary_key}")
     end
 
     def update_read_marks_for_user(reader, timestamp)
