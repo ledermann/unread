@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'activerecord', '>= 3'
+  s.add_dependency 'upsert', '~> 2.2.1'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'timecop'

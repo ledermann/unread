@@ -65,6 +65,8 @@ def setup_db
 
   ActiveRecord::Base.establish_connection(db_name.to_sym)
   ActiveRecord::Base.default_timezone = :utc
+  ActiveRecord::Base.logger = Logger.new(File.join(__dir__, "debug.log"))
+  ActiveRecord::Base.logger.level = ENV["CI"] ? ::Logger::ERROR : ::Logger::DEBUG
   ActiveRecord::Migration.verbose = false
 
   UnreadMigration.up
