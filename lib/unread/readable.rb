@@ -41,10 +41,14 @@ module Unread
         }
 
         if using_postgresql?
+          # With PostgreSQL, a transaction is unusable after a unique constraint vialoation.
+          # To avoid this, nested transactions are required.
+          # http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Exception+handling+and+rolling+back
           ReadMark.transaction(requires_new: true) do
             begin
               marking_proc.call
             rescue ActiveRecord::RecordNotUnique
+              # The object is explicitly marked as read, so rollback the inner transaction
               raise ActiveRecord::Rollback
             end
           end
