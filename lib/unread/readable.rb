@@ -27,19 +27,36 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              # This transaction is needed, so that parent transaction won't rollback even there's an error.
-              ReadMark.transaction(requires_new: true) do
-                begin
-                  rm = obj.read_marks.where(reader_id: reader.id, reader_type: reader.class.base_class.name).first || obj.read_marks.build
-                  rm.reader_id   = reader.id
-                  rm.reader_type = reader.class.base_class.name
-                  rm.timestamp   = timestamp
-                  rm.save!
-                rescue ActiveRecord::RecordNotUnique
-                  raise ActiveRecord::Rollback
-                end
-              end
+              mark_collection_item_as_read(obj, reader, timestamp)
             end
+          end
+        end
+      end
+
+      def mark_collection_item_as_read(obj, reader, timestamp)
+        marking_proc = proc {
+          rm = obj.read_marks.find_or_initialize_by(reader: reader)
+          rm.timestamp = timestamp
+          rm.save!
+        }
+
+        if using_postgresql?
+          # With PostgreSQL, a transaction is unusable after a unique constraint vialoation.
+          # To avoid this, nested transactions are required.
+          # http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Exception+handling+and+rolling+back
+          ReadMark.transaction(requires_new: true) do
+            begin
+              marking_proc.call
+            rescue ActiveRecord::RecordNotUnique
+              # The object is explicitly marked as read, so rollback the inner transaction
+              raise ActiveRecord::Rollback
+            end
+          end
+        else
+          begin
+            marking_proc.call
+          rescue ActiveRecord::RecordNotUnique
+            # The object is explicitly marked as read, so there is nothing to do
           end
         end
       end
