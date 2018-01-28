@@ -34,7 +34,7 @@ module Unread
       end
 
       def mark_collection_item_as_read(obj, reader)
-        marking_proc = proc { |obj|
+        marking_proc = proc {
           rm = obj.read_marks.find_or_initialize_by(reader: reader)
           rm.timestamp = obj.send(readable_options[:on])
           rm.save!
@@ -43,14 +43,14 @@ module Unread
         if using_postgresql?
           ReadMark.transaction(requires_new: true) do
             begin
-              marking_proc.call(obj)
+              marking_proc.call
             rescue ActiveRecord::RecordNotUnique
               raise ActiveRecord::Rollback
             end
           end
         else
           begin
-            marking_proc.call(obj)
+            marking_proc.call
           rescue ActiveRecord::RecordNotUnique
             # The object is explicitly marked as read, so there is nothing to do
           end
