@@ -27,16 +27,16 @@ module Unread
             if global_timestamp && global_timestamp >= timestamp
               # The object is implicitly marked as read, so there is nothing to do
             else
-              mark_collection_item_as_read(obj, reader)
+              mark_collection_item_as_read(obj, reader, timestamp)
             end
           end
         end
       end
 
-      def mark_collection_item_as_read(obj, reader)
+      def mark_collection_item_as_read(obj, reader, timestamp)
         marking_proc = proc {
           rm = obj.read_marks.find_or_initialize_by(reader: reader)
-          rm.timestamp = obj.send(readable_options[:on])
+          rm.timestamp = timestamp
           rm.save!
         }
 
