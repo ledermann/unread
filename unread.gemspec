@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "unread/version"
 
 Gem::Specification.new do |s|
@@ -13,15 +14,16 @@ Gem::Specification.new do |s|
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
   s.required_ruby_version = '>= 2.2'
 
-  s.rubyforge_project = "unread"
-
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = `git ls-files -z`.split("\x0").reject do |f|
+    f.match(%r{^(test|spec|features)/})
+  end
+  s.bindir        = "exe"
+  s.executables   = s.files.grep(%r{^exe/}) { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
   s.add_dependency 'activerecord', '>= 3'
 
+  s.add_development_dependency 'bundler'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'sqlite3'
