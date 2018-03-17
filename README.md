@@ -160,6 +160,30 @@ users[1].have_read?(message2)
 Message.cleanup_read_marks!
 ```
 
+## Getting read/unread stats through a relationship
+
+```ruby
+class Document < ApplicationRecord
+  has_many :comments
+end
+
+class Comment < ApplicationRecord
+  acts_as_readable on: :created_at
+  belongs_to :document
+end
+
+# Get unread comments count for a document
+document = Document.find(1)
+default_hash = Hash.new { |h, k| h[k] = { unread: 0, total: 0 } }
+document.comments.with_read_marks_for(current_user).reduce(default_hash) do |hash, comment|
+  hash[comment.id][:unread] += 1 if comment.unread?(current_user)
+  hash[comment.id][:total] += 1
+  hash
+end
+# => {20=>{:unread=>1, :total=>10}, 82=>{:unread=>0, :total=>4}
+```
+
+Using `with_read_marks_for` here is the key. It uses just one query and makes sure that the following `unread?` invocations use the result of the first query.
 
 ## How does it work?
 
