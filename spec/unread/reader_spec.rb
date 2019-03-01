@@ -149,7 +149,7 @@ describe Unread::Reader do
       wait
       expect(@reader.have_read?(@email1)).to be_truthy
 
-      @email1.update_attributes! subject: 'changed'
+      @email1.update! subject: 'changed'
       expect(@reader.have_read?(@email1)).to be_falsey
     end
 
