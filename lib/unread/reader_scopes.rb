@@ -31,7 +31,7 @@ module Unread
 
         join_read_marks(readable).select("#{quoted_table_name}.*,
                                           #{ReadMark.quoted_table_name}.id AS read_mark_id,
-                                          #{quote_bound_value readable.class.name}#{postgresql_string_cast} AS read_mark_readable_type,
+                                          #{quote_bound_value(readable.class.name)}#{postgresql_string_cast} AS read_mark_readable_type,
                                           #{quote_bound_value(readable.id)} AS read_mark_readable_id")
       end
     end
