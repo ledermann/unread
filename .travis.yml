@@ -36,6 +36,9 @@ env:
   - DB=sqlite
   - DB=mysql
   - DB=postgres
+services:
+  - mysql
+  - postgres
 before_script:
   - gem update --system # https://github.com/travis-ci/travis-ci/issues/8978
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database IF NOT EXISTS unread_test;'; fi"
