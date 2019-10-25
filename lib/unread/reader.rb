@@ -16,7 +16,13 @@ module Unread
       def read_mark_global(klass)
         @read_mark_global ||= {}
         readable_klass = klass.readable_parent
-        @read_mark_global[readable_klass] ||= read_marks.where(readable_type: readable_klass.name).global.first
+
+        # Memoize with NIL handling
+        if @read_mark_global.has_key?(readable_klass)
+          @read_mark_global[readable_klass]
+        else
+          @read_mark_global[readable_klass] = read_marks.where(readable_type: readable_klass.name).global.first
+        end
       end
 
       def forget_memoized_read_mark_global
