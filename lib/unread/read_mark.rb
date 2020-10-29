@@ -1,5 +1,5 @@
 class ReadMark < ActiveRecord::Base
-  belongs_to :readable, polymorphic: true, inverse_of: :read_marks
+  belongs_to :readable, polymorphic: true, inverse_of: :read_marks, optional: true
 
   validates_presence_of :reader_id, :reader_type, :readable_type
 
