@@ -25,7 +25,6 @@ matrix:
       gemfile: gemfiles/rails_4_0.gemfile
     - rvm: 2.7.2
       gemfile: gemfiles/rails_4_1.gemfile
-before_install: gem update bundler
     - rvm: 2.7.2
       gemfile: gemfiles/rails_4_2.gemfile
 sudo: false
@@ -37,7 +36,6 @@ services:
   - mysql
   - postgres
 before_script:
-  - gem update --system # https://github.com/travis-ci/travis-ci/issues/8978
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database IF NOT EXISTS unread_test;'; fi"
   - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database unread_test;' -U postgres; fi"
 addons:
