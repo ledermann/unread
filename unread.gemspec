@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version     = Unread::VERSION
   s.licenses    = ['MIT']
   s.authors     = ["Georg Ledermann"]
-  s.email       = ["mail@georg-ledermann.de"]
+  s.email       = ["georg@ledermann.dev"]
   s.homepage    = "https://github.com/ledermann/unread"
   s.summary     = %q{Manages read/unread status of ActiveRecord objects}
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
