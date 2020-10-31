@@ -253,6 +253,34 @@ describe Unread::Readable do
 
       expect(@reader.read_marks.single.count).to eq 1
     end
+
+    context 'when the reader class defines a default_scope that excludes tha reader instance' do
+      before { ReadMark.stub(belongs_to_required_by_default: true) }
+
+      let!(:reader_class) do
+        CustomReader = Class.new(ActiveRecord::Base) do
+          self.primary_key = 'number'
+          self.table_name = 'readers'
+
+          acts_as_reader
+
+          default_scope { where.not(name: 'foo') }
+        end
+      end
+      let!(:reader) { reader_class.create!(name: 'foo') }
+      let(:document) { Document.create! }
+
+      before do
+        wait
+        document
+      end
+
+      subject { document.mark_as_read!(for: reader) }
+
+      it 'does not raise_error' do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
   describe '.mark_as_read!' do
