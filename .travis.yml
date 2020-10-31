@@ -26,6 +26,8 @@ matrix:
     - rvm: 2.7.2
       gemfile: gemfiles/rails_4_1.gemfile
 before_install: gem update bundler
+    - rvm: 2.7.2
+      gemfile: gemfiles/rails_4_2.gemfile
 sudo: false
 env:
   - DB=sqlite
