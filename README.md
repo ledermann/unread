@@ -223,4 +223,4 @@ AND messages.created_at > '2010-10-20 08:50:00'
 Hint: You should add a database index on `messages.created_at`.
 
 
-Copyright (c) 2010-2020 [Georg Ledermann](https://ledermann.dev) and [contributors](https://github.com/ledermann/unread/graphs/contributors), released under the MIT license
+Copyright (c) 2010-2021 [Georg Ledermann](https://ledermann.dev) and [contributors](https://github.com/ledermann/unread/graphs/contributors), released under the MIT license
