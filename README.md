@@ -3,7 +3,7 @@ Unread
 
 Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
-[![Build Status](https://travis-ci.org/ledermann/unread.svg?branch=master)](https://travis-ci.org/ledermann/unread)
+[![Build Status](https://github.com/ledermann/unread/workflows/Test/badge.svg?branch=master)](https://github.com/ledermann/unread/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/930c8df0f99b20324444/maintainability)](https://codeclimate.com/github/ledermann/unread/maintainability)
 [![Coverage Status](https://coveralls.io/repos/ledermann/unread/badge.svg?branch=master)](https://coveralls.io/r/ledermann/unread?branch=master)
 
@@ -19,7 +19,7 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 ## Requirements
 
-* Ruby 2.5 or newer
+* Ruby 2.6 or newer
 * Rails 4.0 or newer (including Rails 6)
 * MySQL, PostgreSQL or SQLite
 * Needs a timestamp field in your models (like created_at or updated_at) with a database index on it
