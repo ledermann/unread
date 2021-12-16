@@ -118,11 +118,6 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
 
-    - name: Install database client
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y mysql-client libmariadbclient-dev
-
     - name: Install gems
       env:
         MATRIX_RAILS_VERSION: ${{ matrix.rails }}
