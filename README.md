@@ -19,8 +19,8 @@ Ruby gem to manage read/unread status of ActiveRecord objects - and it's fast.
 
 ## Requirements
 
-* Ruby 2.6 or newer
-* Rails 4.0 or newer (including Rails 7)
+* Ruby 2.7 or newer
+* Rails 6.0 or newer (including Rails 7)
 * MySQL, PostgreSQL or SQLite
 * Needs a timestamp field in your models (like created_at or updated_at) with a database index on it
 

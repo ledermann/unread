@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/ledermann/unread"
   s.summary     = %q{Manages read/unread status of ActiveRecord objects}
   s.description = %q{This gem creates a scope for unread objects and adds methods to mark objects as read }
-  s.required_ruby_version = '>= 2.6'
+  s.required_ruby_version = '>= 2.7'
 
   s.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
