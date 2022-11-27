@@ -64,7 +64,12 @@ def setup_db
   puts "Testing with ActiveRecord #{ActiveRecord::VERSION::STRING} on #{db_name}"
 
   ActiveRecord::Base.establish_connection(db_name.to_sym)
-  ActiveRecord::Base.default_timezone = :utc
+  if ActiveRecord.respond_to?(:default_timezone=)
+    # Rails 7
+    ActiveRecord.default_timezone = :utc
+  else
+    ActiveRecord::Base.default_timezone = :utc
+  end
   ActiveRecord::Migration.verbose = false
 
   UnreadMigration.up
