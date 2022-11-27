@@ -1,4 +1,4 @@
-class SpecMigration < Unread::MIGRATION_BASE_CLASS
+class SpecMigration < ActiveRecord::Migration[6.0]
   def self.up
     create_table Reader, primary_key: 'number', force: true do |t|
       t.string :name
