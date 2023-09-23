@@ -36,6 +36,7 @@ jobs:
     - name: RSpec
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        DB: sqlite
       run: bundle exec rake
 
   test_mysql:
@@ -84,6 +85,7 @@ jobs:
     - name: RSpec
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        DB: mysql
       run: bundle exec rake
 
   test_postgres:
@@ -132,4 +134,5 @@ jobs:
     - name: RSpec
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        DB: postgres
       run: bundle exec rake
