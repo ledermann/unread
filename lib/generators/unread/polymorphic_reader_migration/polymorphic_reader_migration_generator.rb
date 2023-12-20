@@ -13,11 +13,22 @@ module Unread
     end
 
     def self.next_migration_number(dirname)
-      if ActiveRecord::Base.timestamped_migrations
-        Time.now.utc.strftime("%Y%m%d%H%M%S")
+      if self.timestamped_migrations?
+        Time.now.utc.strftime('%Y%m%d%H%M%S')
       else
         "%.3d" % (current_migration_number(dirname) + 1)
       end
+    end
+
+    def self.timestamped_migrations?
+      (
+        ActiveRecord::Base.respond_to?(:timestamped_migrations) &&
+          ActiveRecord::Base.timestamped_migrations
+      ) ||
+        (
+          ActiveRecord.respond_to?(:timestamped_migrations) &&
+            ActiveRecord.timestamped_migrations
+        )
     end
   end
 end
