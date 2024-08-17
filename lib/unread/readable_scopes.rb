@@ -7,8 +7,8 @@ module Unread
         joins "LEFT JOIN #{ReadMark.quoted_table_name}
                 ON #{ReadMark.quoted_table_name}.readable_type  = '#{readable_parent.name}'
                AND #{ReadMark.quoted_table_name}.readable_id    = #{quoted_table_name}.#{quoted_primary_key}
-               AND #{ReadMark.quoted_table_name}.reader_id      = #{quote_bound_value(reader.id)}
-               AND #{ReadMark.quoted_table_name}.reader_type    = #{quote_bound_value(reader.class.base_class.name)}
+               AND #{ReadMark.quoted_table_name}.reader_id      = #{quoted(reader.id)}
+               AND #{ReadMark.quoted_table_name}.reader_type    = #{quoted(reader.class.base_class.name)}
                AND #{ReadMark.quoted_table_name}.timestamp     >= #{quoted_table_name}.#{connection.quote_column_name(readable_options[:on])}"
       end
 
@@ -39,8 +39,16 @@ module Unread
 
         join_read_marks(reader).select("#{quoted_table_name}.*,
                                         #{ReadMark.quoted_table_name}.id AS read_mark_id,
-                                        #{quote_bound_value(reader.class.base_class.name)}#{postgresql_string_cast} AS read_mark_reader_type,
-                                        #{quote_bound_value(reader.id)} AS read_mark_reader_id")
+                                        #{quoted(reader.class.base_class.name)}#{postgresql_string_cast} AS read_mark_reader_type,
+                                        #{quoted(reader.id)} AS read_mark_reader_id")
+      end
+
+      def quoted(value)
+        if Gem::Version.new(ActiveRecord::VERSION::STRING) >= Gem::Version.new('7.2')
+          quote_bound_value(connection, value)
+        else
+          quote_bound_value(value)
+        end
       end
     end
   end
