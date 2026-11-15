@@ -13,8 +13,8 @@ RSpec.describe Unread::Reader do
 
   describe '.have_not_read' do
     it 'returns all readers that have not read a given object' do
-      expect(Reader.have_not_read(email)).to eq [reader, other_reader]
-      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
+      expect(Reader.have_not_read(email)).to contain_exactly(reader, other_reader)
+      expect(Reader.have_not_read(sti_email)).to contain_exactly(reader, other_reader)
     end
 
     it 'returns *only* the readers that have not read a given object' do
@@ -22,7 +22,7 @@ RSpec.describe Unread::Reader do
 
       expect(Reader.have_not_read(email)).to eq [other_reader]
       expect(Reader.have_not_read(email).count).to eq 1
-      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
+      expect(Reader.have_not_read(sti_email)).to contain_exactly(reader, other_reader)
     end
 
     it 'takes the type of reader into account', :aggregate_failures do
@@ -36,7 +36,7 @@ RSpec.describe Unread::Reader do
       email.mark_as_read! for: different_reader
 
       expect(DifferentReader.have_not_read(email)).to be_empty
-      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
+      expect(Reader.have_not_read(sti_email)).to contain_exactly(reader, other_reader)
     end
 
     it_behaves_like 'a method requiring a readable' do
@@ -72,11 +72,11 @@ RSpec.describe Unread::Reader do
 
   describe '.with_read_marks_for' do
     it 'returns readers' do
-      expect(Reader.with_read_marks_for(email).to_a).to eq [reader, other_reader]
+      expect(Reader.with_read_marks_for(email).order(:number).to_a).to contain_exactly(reader, other_reader)
     end
 
     it 'returns elements that respond to :read_mark_id' do
-      expect(Reader.with_read_marks_for(email).to_a).to all(respond_to(:read_mark_id))
+      expect(Reader.with_read_marks_for(email).order(:number).to_a).to all(respond_to(:read_mark_id))
     end
 
     it 'is countable' do
@@ -111,7 +111,7 @@ RSpec.describe Unread::Reader do
       email.mark_as_read! for: reader
 
       expect do
-        readers = Reader.with_read_marks_for(email).to_a
+        readers = Reader.with_read_marks_for(email).order(:number).to_a
 
         expect(readers[0].have_read?(email)).to be true
         expect(readers[1].have_read?(email)).to be false
@@ -121,7 +121,7 @@ RSpec.describe Unread::Reader do
     it 'works with eager-loaded read marks for the correct readable' do
       email.mark_as_read! for: reader
 
-      readers = Reader.with_read_marks_for(email).to_a
+      readers = Reader.with_read_marks_for(email).order(:number).to_a
       expect(readers[0].have_read?(email)).to be true
       expect(readers[0].have_read?(sti_email)).to be false
     end

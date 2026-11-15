@@ -14,8 +14,8 @@ RSpec.describe Unread::Readable do
   describe '.unread_by' do
     shared_examples 'unread_by' do
       it 'returns all objects' do
-        expect(Email.unread_by(reader)).to eq [email, sti_email]
-        expect(Email.unread_by(other_reader)).to eq [email, sti_email]
+        expect(Email.unread_by(reader)).to contain_exactly(email, sti_email)
+        expect(Email.unread_by(other_reader)).to contain_exactly(email, sti_email)
       end
 
       it 'returns unread records' do
@@ -23,7 +23,7 @@ RSpec.describe Unread::Readable do
 
         expect(Email.unread_by(reader)).to eq [sti_email]
         expect(Email.unread_by(reader).count).to eq 1
-        expect(Email.unread_by(other_reader)).to eq [email, sti_email]
+        expect(Email.unread_by(other_reader)).to contain_exactly(email, sti_email)
       end
 
       it 'returns nothing after marking all as read' do
@@ -63,7 +63,7 @@ RSpec.describe Unread::Readable do
       it 'returns all records when all are read' do
         Email.mark_as_read! :all, for: reader
 
-        expect(Email.read_by(reader)).to eq [email, sti_email]
+        expect(Email.read_by(reader)).to contain_exactly(email, sti_email)
       end
 
       it_behaves_like 'a method requiring a reader' do
@@ -82,7 +82,7 @@ RSpec.describe Unread::Readable do
 
   describe '.with_read_marks_for' do
     it 'returns readables' do
-      expect(Email.with_read_marks_for(reader).to_a).to eq [email, sti_email]
+      expect(Email.with_read_marks_for(reader).order(:uid).to_a).to contain_exactly(email, sti_email)
     end
 
     it 'is countable' do
@@ -117,7 +117,7 @@ RSpec.describe Unread::Readable do
       email.mark_as_read! for: reader
 
       expect do
-        emails = Email.with_read_marks_for(reader).to_a
+        emails = Email.with_read_marks_for(reader).order(:uid).to_a
 
         expect(emails[0].unread?(reader)).to be false
         expect(emails[1].unread?(reader)).to be true
@@ -127,7 +127,7 @@ RSpec.describe Unread::Readable do
     it 'works without any read marks' do
       ReadMark.delete_all
 
-      emails = Email.with_read_marks_for(reader).to_a
+      emails = Email.with_read_marks_for(reader).order(:uid).to_a
       expect(emails[0].unread?(reader)).to be true
       expect(emails[1].unread?(reader)).to be true
     end
@@ -135,7 +135,7 @@ RSpec.describe Unread::Readable do
     it 'works with eager-loaded read marks for the correct reader' do
       email.mark_as_read! for: reader
 
-      emails = Email.with_read_marks_for(reader).to_a
+      emails = Email.with_read_marks_for(reader).order(:uid).to_a
       expect(emails[0].unread?(reader)).to be false
       expect(emails[0].unread?(other_reader)).to be true
     end
@@ -158,7 +158,7 @@ RSpec.describe Unread::Readable do
       expect(Email.unread_by(reader)).to eq [sti_email]
 
       expect(email.unread?(other_reader)).to be true
-      expect(Email.unread_by(other_reader)).to eq [email, sti_email]
+      expect(Email.unread_by(other_reader)).to contain_exactly(email, sti_email)
 
       expect(reader.read_marks.single.count).to eq 1
       expect(reader.read_marks.single.first.readable).to eq email
