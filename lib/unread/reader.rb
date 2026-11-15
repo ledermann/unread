@@ -21,6 +21,11 @@ module Unread
         end
       end
 
+      def reload(...)
+        forget_memoized_read_mark_global
+        super
+      end
+
       private
 
       def forget_memoized_read_mark_global
