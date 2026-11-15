@@ -1,0 +1,73 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'coverage/**/*'
+    - 'pkg/**/*'
+    - 'vendor/**/*'
+
+# Layout
+
+Layout/LineLength:
+  Max: 130
+
+# Metrics
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/MethodLength:
+  Max: 25
+
+# Naming
+
+# have_read?, have_read and have_not_read are public API
+Naming/PredicatePrefix:
+  Exclude:
+    - 'lib/unread/reader.rb'
+    - 'lib/unread/reader_scopes.rb'
+
+# Style
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+# RSpec
+
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/MultipleExpectations:
+  Max: 4
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - 'spec/generators/**/*'
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 8
