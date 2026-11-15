@@ -1,138 +1,80 @@
 name: Test
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  - push
+  - pull_request
+
+permissions:
+  contents: read
 
 jobs:
-  test_sqlite:
-    runs-on: ubuntu-latest
+  lint:
+    name: RuboCop
+    runs-on: ubuntu-26.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+
+      - run: bundle exec rubocop
+
+  test:
+    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }} / ${{ matrix.db }}
+    runs-on: ubuntu-26.04
+    continue-on-error: ${{ matrix.rails == 'edge' }}
 
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['3.2', '3.3', '3.4', '4.0']
-        rails: ['7.2', '8.0', '8.1']
+        ruby: ['3.3', '3.4', '4.0']
+        rails: ['8.1']
+        db: [sqlite, mysql, trilogy, postgres]
+        include:
+          - ruby: '4.0'
+            rails: edge
+            db: sqlite
 
-    name: SQLite / Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-
-    - name: Install gems
-      env:
-        MATRIX_RAILS_VERSION: ${{ matrix.rails }}
-      run: |
-        export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/rails_${MATRIX_RAILS_VERSION}.gemfile"
-        bundle install --jobs 4 --retry 3
-
-    - name: RSpec
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        DB: sqlite
-      run: bundle exec rake
-
-  test_mysql:
-    runs-on: ubuntu-latest
+    env:
+      RAILS_VERSION: ${{ matrix.rails }}
+      DB: ${{ matrix.db }}
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: unread_test
         ports:
-        - 3306:3306
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
 
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ['3.2', '3.3', '3.4', '4.0']
-        rails: ['7.2', '8.0', '8.1']
-
-    name: MySQL / Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-
-    - name: Install gems
-      env:
-        MATRIX_RAILS_VERSION: ${{ matrix.rails }}
-      run: |
-        export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/rails_${MATRIX_RAILS_VERSION}.gemfile"
-        bundle install --jobs 4 --retry 3
-
-    - name: Setup database
-      run: |
-        mysql -e 'create database IF NOT EXISTS unread_test;' -u root --password=password -P 3306 -h 127.0.0.1
-
-    - name: RSpec
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        DB: mysql
-      run: bundle exec rake
-
-  test_postgres:
-    runs-on: ubuntu-latest
-
-    services:
       postgres:
-        image: postgres
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          POSTGRES_DB: unread_test
         ports:
           - 5432:5432
-
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ['3.2', '3.3', '3.4', '4.0']
-        rails: ['7.2', '8.0', '8.1']
-
-    name: PostgreSQL / Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+        options: >-
+          --health-cmd=pg_isready
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
-    - name: Install gems
-      env:
-        MATRIX_RAILS_VERSION: ${{ matrix.rails }}
-      run: |
-        export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/rails_${MATRIX_RAILS_VERSION}.gemfile"
-        bundle install --jobs 4 --retry 3
-
-    - name: Setup database
-      run: |
-        PGPASSWORD=postgres psql -c 'create database unread_test;' -U postgres -p 5432 -h localhost
-
-    - name: RSpec
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        DB: postgres
-      run: bundle exec rake
+      - run: bundle exec rspec
