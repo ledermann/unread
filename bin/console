@@ -1,35 +1,16 @@
 #!/usr/bin/env ruby
 
+# Start IRB with the spec models on a fresh database (default: SQLite in memory)
 require 'bundler/setup'
+require 'erb'
+require 'irb'
 require 'unread'
 
-$LOAD_PATH.unshift(File.expand_path('..', File.dirname(__FILE__)))
-require 'lib/generators/unread/migration/templates/migration.rb'
-require 'spec/support/spec_migration.rb'
+$LOAD_PATH.unshift(File.expand_path('../spec', __dir__))
+require 'app/models'
+require 'support/database'
 
-require 'spec/app/models/reader'
-require 'spec/app/models/different_reader'
-require 'spec/app/models/customer'
-require 'spec/app/models/sti_reader'
-require 'spec/app/models/document'
-require 'spec/app/models/email'
+Database.setup
+ActiveRecord::Base.logger = Logger.new($stdout)
 
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
-
-# (If you use this, don't forget to add pry to your Gemfile!)
-# require "pry"
-# Pry.start
-
-ActiveRecord::Base.configurations = YAML.load_file('spec/database.yml')
-ActiveRecord::Base.establish_connection((ENV['DB'] || 'sqlite').to_sym)
-ActiveRecord::Migration.verbose = false
-
-UnreadMigration.up
-SpecMigration.up
-
-ActiveRecord::Base.logger = Logger.new(STDOUT) if defined?(Logger)
-
-require 'irb'
-require 'irb/completion'
-IRB.start
+IRB.start(__FILE__)

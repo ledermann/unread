@@ -1,11 +1,9 @@
-require 'spec_helper'
-
-describe ReadMark do
-  it "should have reader_class" do
-    expect(ReadMark.reader_classes).to eq [Reader, DifferentReader, StiReader]
+RSpec.describe ReadMark do
+  it 'knows the reader classes' do
+    expect(described_class.reader_classes).to eq [Reader, DifferentReader, StiReader]
   end
 
-  it "should have readable_classes" do
-    expect(ReadMark.readable_classes).to eq [Document]
+  it 'knows the readable classes' do
+    expect(described_class.readable_classes).to eq [Document]
   end
 end

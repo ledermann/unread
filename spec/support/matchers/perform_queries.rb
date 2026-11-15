@@ -2,18 +2,16 @@ RSpec::Matchers.define :perform_queries do |expected|
   supports_block_expectations
 
   match do |block|
-    query_count(&block) == expected
+    @count = 0
+    counter = lambda do |*, payload|
+      @count += 1 unless payload[:cached] || %w[CACHE SCHEMA TRANSACTION].include?(payload[:name])
+    end
+
+    ActiveSupport::Notifications.subscribed(counter, 'sql.active_record', &block)
+    @count == expected
   end
 
-  failure_message do |actual|
-    "Expected to run #{expected} queries, got #{@counter.query_count}"
-  end
-
-  def query_count(&block)
-    @counter = ActiveRecord::QueryCounter.new
-    ActiveSupport::Notifications.subscribe('sql.active_record', @counter.to_proc)
-    yield
-    ActiveSupport::Notifications.unsubscribe(@counter.to_proc)
-    @counter.query_count
+  failure_message do
+    "expected to perform #{expected} queries, but performed #{@count}"
   end
 end

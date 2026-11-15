@@ -1,181 +1,129 @@
-require 'spec_helper'
-
-describe Unread::Reader do
-  before :each do
-    @reader = Reader.create! name: 'David'
-    @other_reader = Reader.create name: 'Matz'
-    @different_reader = DifferentReader.create! name: 'Behrooz', number: @reader.number
+RSpec.describe Unread::Reader do
+  let!(:reader) { Reader.create!(name: 'David') }
+  let!(:other_reader) { Reader.create!(name: 'Matz') }
+  let!(:different_reader) { DifferentReader.create!(name: 'Behrooz', number: reader.number) }
+  let!(:email) do
     wait
-    @email1 = Email.create!
+    Email.create!
+  end
+  let!(:sti_email) do
     wait
-    @email2 = MultiLevelStiReadable.create!
+    MultiLevelStiReadable.create!
   end
 
-  describe :have_not_read do
-    it "should return all readers that have not read a given object" do
-      expect(Reader.have_not_read(@email1)).to eq [@reader, @other_reader]
-      expect(Reader.have_not_read(@email2)).to eq [@reader, @other_reader]
+  describe '.have_not_read' do
+    it 'returns all readers that have not read a given object' do
+      expect(Reader.have_not_read(email)).to eq [reader, other_reader]
+      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
     end
 
-    it "should return *only* the readers that have not read a given object" do
-      @email1.mark_as_read! for: @reader
+    it 'returns *only* the readers that have not read a given object' do
+      email.mark_as_read! for: reader
 
-      expect(Reader.have_not_read(@email1)).to eq [@other_reader]
-      expect(Reader.have_not_read(@email1).count).to eq 1
-
-      expect(Reader.have_not_read(@email2)).to eq [@reader, @other_reader]
+      expect(Reader.have_not_read(email)).to eq [other_reader]
+      expect(Reader.have_not_read(email).count).to eq 1
+      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
     end
 
-    it "should take the type of reader into account" do
-      # even though the id of @reader and @different_reader is the same because
-      # they are different object types, the @email1 should only be marked as
-      # read for @reader.
-      @email1.mark_as_read! for: @reader
+    it 'takes the type of reader into account', :aggregate_failures do
+      # reader and different_reader share the same id, but they are of
+      # different types, so email must only be marked as read for reader
+      email.mark_as_read! for: reader
 
-      expect(Reader.have_not_read(@email1)).to eq [@other_reader]
-      expect(Reader.have_not_read(@email1).count).to eq 1
+      expect(Reader.have_not_read(email)).to eq [other_reader]
+      expect(DifferentReader.have_not_read(email)).to eq [different_reader]
 
-      expect(DifferentReader.have_not_read(@email1)).to eq [@different_reader]
-      expect(DifferentReader.have_not_read(@email1).count).to eq 1
+      email.mark_as_read! for: different_reader
 
-      @email1.mark_as_read! for: @different_reader
-
-      expect(DifferentReader.have_not_read(@email1).count).to eq 0
-
-      expect(Reader.have_not_read(@email2)).to eq [@reader, @other_reader]
+      expect(DifferentReader.have_not_read(email)).to be_empty
+      expect(Reader.have_not_read(sti_email)).to eq [reader, other_reader]
     end
 
-    it "should not allow invalid parameter" do
-      [ 42, nil, 'foo', :foo, {} ].each do |not_a_readable|
-        expect {
-          Reader.have_not_read(not_a_readable)
-        }.to raise_error(ArgumentError)
-      end
-    end
-
-    it "should not allow unsaved readable" do
-      unsaved_readable = Email.new
-
-      expect {
-        Reader.have_not_read(unsaved_readable)
-      }.to raise_error(ArgumentError)
+    it_behaves_like 'a method requiring a readable' do
+      let(:action) { ->(readable) { Reader.have_not_read(readable) } }
     end
   end
 
-  describe :have_read do
-    it "should return an empty array" do
-      expect(Reader.have_read(@email1)).to be_empty
-      expect(Reader.have_read(@email2)).to be_empty
+  describe '.have_read' do
+    it 'returns nothing if nothing is read' do
+      expect(Reader.have_read(email)).to be_empty
+      expect(Reader.have_read(sti_email)).to be_empty
     end
 
-    it "should return *only* the readers that have read the given object" do
-      @email1.mark_as_read! for: @reader
+    it 'returns *only* the readers that have read the given object' do
+      email.mark_as_read! for: reader
 
-      expect(Reader.have_read(@email1)).to eq [@reader]
-      expect(Reader.have_read(@email1).count).to eq 1
-
-      expect(Reader.have_read(@email2)).to be_empty
+      expect(Reader.have_read(email)).to eq [reader]
+      expect(Reader.have_read(email).count).to eq 1
+      expect(Reader.have_read(sti_email)).to be_empty
     end
 
-    it "should return the reader for all the object when all read" do
-      Email.mark_as_read! :all, for: @reader
+    it 'returns the reader for all objects when all are read' do
+      Email.mark_as_read! :all, for: reader
 
-      expect(Reader.have_read(@email1)).to eq [@reader]
-      expect(Reader.have_read(@email1).count).to eq 1
-
-      expect(Reader.have_read(@email2)).to eq [@reader]
-      expect(Reader.have_read(@email2).count).to eq 1
+      expect(Reader.have_read(email)).to eq [reader]
+      expect(Reader.have_read(sti_email)).to eq [reader]
     end
 
-    it "should not allow invalid parameter" do
-      [ 42, nil, 'foo', :foo, {} ].each do |not_a_readable|
-        expect {
-          Reader.have_read(not_a_readable)
-        }.to raise_error(ArgumentError)
-      end
-    end
-
-    it "should not allow unsaved readable" do
-      unsaved_readable = Email.new
-
-      expect {
-        Reader.have_read(unsaved_readable)
-      }.to raise_error(ArgumentError)
+    it_behaves_like 'a method requiring a readable' do
+      let(:action) { ->(readable) { Reader.have_read(readable) } }
     end
   end
 
-  describe :with_read_marks_for do
-    it "should return readers" do
-      expect(Reader.with_read_marks_for(@email1).to_a).to eq([@reader, @other_reader])
+  describe '.with_read_marks_for' do
+    it 'returns readers' do
+      expect(Reader.with_read_marks_for(email).to_a).to eq [reader, other_reader]
     end
 
-    it "should have elements that respond to :read_mark_id" do
-      all_respond_to_read_mark_id = Reader.with_read_marks_for(@email1).to_a.all? do |reader|
-        reader.respond_to?(:read_mark_id)
-      end
-
-      expect(all_respond_to_read_mark_id).to be_truthy
+    it 'returns elements that respond to :read_mark_id' do
+      expect(Reader.with_read_marks_for(email).to_a).to all(respond_to(:read_mark_id))
     end
 
-    it "should be countable" do
-      expect(Reader.with_read_marks_for(@email1).count(:number)).to eq(2)
+    it 'is countable' do
+      expect(Reader.with_read_marks_for(email).count(:number)).to eq 2
     end
 
-    it "should not allow invalid parameter" do
-      [ 42, nil, 'foo', :foo, {} ].each do |not_a_readable|
-        expect {
-          Reader.with_read_marks_for(not_a_readable)
-        }.to raise_error(ArgumentError)
-      end
-    end
-
-    it "should not allow unsaved readable" do
-      unsaved_readable = Email.new
-
-      expect {
-        Reader.with_read_marks_for(unsaved_readable)
-      }.to raise_error(ArgumentError)
+    it_behaves_like 'a method requiring a readable' do
+      let(:action) { ->(readable) { Reader.with_read_marks_for(readable) } }
     end
   end
 
-  describe :have_read? do
-    it "should recognize read objects" do
-      expect(@reader.have_read?(@email1)).to be_falsey
-      expect(@reader.have_read?(@email2)).to be_falsey
+  describe '#have_read?' do
+    it 'recognizes unread objects' do
+      expect(reader.have_read?(email)).to be false
+      expect(reader.have_read?(sti_email)).to be false
     end
 
-    it "should handle updating object" do
-      @email1.mark_as_read! for: @reader
+    it 'handles an updated object' do
+      email.mark_as_read! for: reader
       wait
-      expect(@reader.have_read?(@email1)).to be_truthy
+      expect(reader.have_read?(email)).to be true
 
-      @email1.update! subject: 'changed'
-      expect(@reader.have_read?(@email1)).to be_falsey
+      email.update!(subject: 'changed')
+      expect(reader.have_read?(email)).to be false
     end
 
-    it "should raise error for invalid argument" do
-      expect {
-        @reader.have_read?(42)
-      }.to raise_error(ArgumentError)
+    it 'raises for an invalid argument' do
+      expect { reader.have_read?(42) }.to raise_error(ArgumentError)
     end
 
-    it "should work with eager-loaded read marks" do
-      @email1.mark_as_read! for: @reader
+    it 'works with eager-loaded read marks' do
+      email.mark_as_read! for: reader
 
-      expect {
-        readers = Reader.with_read_marks_for(@email1).to_a
+      expect do
+        readers = Reader.with_read_marks_for(email).to_a
 
-        expect(readers[0].have_read?(@email1)).to be_truthy
-        expect(readers[1].have_read?(@email1)).to be_falsey
-      }.to perform_queries(1)
+        expect(readers[0].have_read?(email)).to be true
+        expect(readers[1].have_read?(email)).to be false
+      end.to perform_queries(1)
     end
 
-    it "should work with eager-loaded read marks for the correct readable" do
-      @email1.mark_as_read! for: @reader
+    it 'works with eager-loaded read marks for the correct readable' do
+      email.mark_as_read! for: reader
 
-      readers = Reader.with_read_marks_for(@email1).to_a
-      expect(readers[0].have_read?(@email1)).to be_truthy
-      expect(readers[0].have_read?(@email2)).to be_falsey
+      readers = Reader.with_read_marks_for(email).to_a
+      expect(readers[0].have_read?(email)).to be true
+      expect(readers[0].have_read?(sti_email)).to be false
     end
   end
 end

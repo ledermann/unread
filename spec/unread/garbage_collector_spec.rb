@@ -1,52 +1,50 @@
-require 'spec_helper'
+RSpec.describe Unread::GarbageCollector do
+  subject(:garbage_collector) { described_class.new(Email) }
 
-describe Unread::GarbageCollector do
-  before :each do
-    @reader = Reader.create! name: 'David'
-    @other_reader = Reader.create name: 'Matz'
-    @sti_reader = StiReader.create!
+  let!(:reader) { Reader.create!(name: 'David') }
+  let!(:email) do
     wait
-    @email1 = Email.create!
+    Email.create!
+  end
+  let!(:sti_email) do
     wait
-    @email2 = MultiLevelStiReadable.create!
+    MultiLevelStiReadable.create!
   end
 
-  describe :run! do
-    it "should delete all single read marks" do
-      expect(@reader.read_marks.single.count).to eq 0
+  before do
+    Reader.create!(name: 'Matz')
+    StiReader.create!
+  end
 
-      @email1.mark_as_read! for: @reader
+  describe '#run!' do
+    it 'deletes all single read marks' do
+      email.mark_as_read! for: reader
+      expect(Email.unread_by(reader)).to eq [sti_email]
+      expect(reader.read_marks.single.count).to eq 1
 
-      expect(Email.unread_by(@reader)).to eq [@email2]
-      expect(@reader.read_marks.single.count).to eq 1
+      garbage_collector.run!
 
-      Unread::GarbageCollector.new(Email).run!
-
-      @reader.reload
-      expect(@reader.read_marks.single.count).to eq 0
+      expect(reader.reload.read_marks.single.count).to eq 0
+      expect(Email.unread_by(reader)).to eq [sti_email]
     end
 
-    it "should reset if all objects are read" do
-      @email1.mark_as_read! for: @reader
-      @email2.mark_as_read! for: @reader
+    it 'resets if all objects are read' do
+      email.mark_as_read! for: reader
+      sti_email.mark_as_read! for: reader
+      expect(reader.read_marks.single.count).to eq 2
 
-      expect(@reader.read_marks.single.count).to eq 2
+      garbage_collector.run!
 
-      Unread::GarbageCollector.new(Email).run!
-
-      expect(@reader.read_marks.single.count).to eq 0
+      expect(reader.reload.read_marks.single.count).to eq 0
+      expect(Email.unread_by(reader)).to be_empty
     end
 
-    it "should not delete read marks from other readables" do
-      other_read_mark = @reader.read_marks.create! do |rm|
-        rm.readable_type = 'Foo'
-        rm.readable_id   = 42
-        rm.timestamp     = 5.years.ago
-      end
+    it 'keeps read marks of other readables' do
+      other_read_mark = reader.read_marks.create!(readable_type: 'Foo', readable_id: 42, timestamp: 5.years.ago)
 
-      Unread::GarbageCollector.new(Email).run!
+      garbage_collector.run!
 
-      expect(ReadMark.exists?(other_read_mark.id)).to be_truthy
+      expect(ReadMark).to exist(other_read_mark.id)
     end
   end
 end
