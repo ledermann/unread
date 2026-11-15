@@ -1,49 +1,45 @@
 # Upgrade notes
 
-## Breaking changes with v0.7.0
+## Upgrade to v1.0.0
 
-There are two important changes needing your attention. Please read the following hints carefully!
+### Ruby and Rails versions
 
+The gem supports only Ruby and Rails versions that still get security fixes:
 
-### Polymorphic readers
+* Ruby 3.3 or newer
+* Rails 8.1 or newer
 
-The gem accepts any type of classes as reader and it's not limited to `User` class anymore. So you can do stuff like:
+If your app uses an older version, stay on v0.14.0.
 
-```ruby
-Customer.have_not_read(message1)
-message1.mark_as_read! for: Customer.find(1)
-```
+### Public API
 
-If you are upgrading from v0.6.3 or older, you need to do the following after upgrading:
+The gem adds fewer methods to your models. These methods are the public API:
 
-```shell
-rails g unread:polymorphic_reader_migration
-rake db:migrate
-```
+* Reader class: `acts_as_reader`, `have_read`, `have_not_read`, `with_read_marks_for`, `reader_scope`
+* Reader instance: `have_read?`, `read_mark_global`
+* Readable class: `acts_as_readable`, `unread_by`, `read_by`, `with_read_marks_for`, `mark_as_read!`, `cleanup_read_marks!`, `read_scope`, `readable_options`
+* Readable instance: `unread?`, `mark_as_read!`
 
-This will alter the `read_marks` table to replace `user` association to a polymorphic association named `reader`. Therefore, `user_id` is going to be renamed to `reader_id` and `reader_type` is going to be added.
+The other methods are now private or moved to `Unread::Internal`:
 
-This change should not break your code unless you've worked with `ReadMark` model directly.
+* `join_read_marks`
+* `mark_collection_as_read` and `mark_collection_item_as_read`
+* `reset_read_marks_for_user`: Use `mark_as_read!(:all, for: reader)`.
+* `readable_parent`
+* `assert_reader`, `assert_reader_class` and `assert_readable`
+* `forget_memoized_read_mark_global`: Use `reload` on the reader. It also clears the memoized global read mark.
+* `using_postgresql?`
 
+If your app calls one of these methods, change it before you upgrade.
 
-### Defining reader_scope
+### Migration generator
 
-The class method `acts_as_reader` doesn't take the option `:scope` anymore. If you have used it, please change this ...
+The generator `unread:migration` changed for new installations:
 
-```ruby
-class User < ActiveRecord::Base
-  acts_as_reader scope: -> { where(is_admin: true) }
-end
-```
+* The migration uses the current Rails migration version and a `change` method.
+* On MySQL, the table uses the default character set of the database. The old migration set `latin1`.
+* The column `reader_id` is `NOT NULL`.
 
-... to this
+You do not have to change existing `read_marks` tables.
 
-```ruby
-class User < ActiveRecord::Base
-  acts_as_reader
-
-  def self.reader_scope
-    where(is_admin: true)
-  end
-end
-```
+The generator `unread:polymorphic_reader_migration` was removed. If you upgrade from v0.6.3 or older, upgrade to v0.14.0 first. Then follow the [upgrade notes of v0.14.0](https://github.com/ledermann/unread/blob/v0.14.0/UPGRADE.md).
