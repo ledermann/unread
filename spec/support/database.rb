@@ -32,7 +32,8 @@ module Database
 
   # Use the same migration as the generator does
   def load_unread_migration
-    eval(ERB.new(File.read(MIGRATION_TEMPLATE)).result, TOPLEVEL_BINDING, MIGRATION_TEMPLATE) # rubocop:disable Security/Eval
+    migration = ERB.new(File.read(MIGRATION_TEMPLATE)).result_with_hash(foreign_key_type: nil)
+    eval(migration, TOPLEVEL_BINDING, MIGRATION_TEMPLATE) # rubocop:disable Security/Eval
   end
 
   def create_spec_tables

@@ -2,8 +2,8 @@ class UnreadMigration < ActiveRecord::Migration[<%= ActiveRecord::Migration.curr
   def change
     create_table :read_marks do |t|
       # readable_id is NULL for the global read mark of a reader
-      t.references :readable, polymorphic: { null: false }
-      t.references :reader, polymorphic: true, null: false
+      t.references :readable, polymorphic: { null: false }<%= foreign_key_type %>
+      t.references :reader, polymorphic: true, null: false<%= foreign_key_type %>
       t.datetime :timestamp, null: false
     end
 
