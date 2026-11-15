@@ -1,48 +1,30 @@
 module Unread
-  def self.included(base)
-    base.extend Base
-  end
-
   module Base
     def acts_as_reader
-      ReadMark.reader_classes ||= []
+      return if ReadMark.reader_classes.include?(self)
 
-      unless ReadMark.reader_classes.include?(self)
-        ReadMark.belongs_to :reader, polymorphic: true, inverse_of: :read_marks, optional: true
+      has_many :read_marks, dependent: :delete_all, as: :reader, inverse_of: :reader
 
-        has_many :read_marks, dependent: :delete_all, as: :reader, inverse_of: :reader
+      after_create :setup_new_reader
 
-        after_create :setup_new_reader
+      ReadMark.reader_classes << self
 
-        ReadMark.reader_classes << self
-
-        include Reader::InstanceMethods
-        extend Reader::ClassMethods
-        extend Reader::Scopes
-      end
+      include Reader::InstanceMethods
+      extend Reader::Scopes
     end
 
-    def acts_as_readable(options={})
-      ReadMark.readable_classes ||= []
+    def acts_as_readable(options = {})
+      return if ReadMark.readable_classes.include?(self)
 
-      unless ReadMark.readable_classes.include?(self)
-        class_attribute :readable_options
+      class_attribute :readable_options, default: options.reverse_merge(on: :updated_at)
 
-        options.reverse_merge!(on: :updated_at)
-        self.readable_options = options
+      has_many :read_marks, as: :readable, dependent: :delete_all, inverse_of: :readable
 
-        has_many :read_marks, as: :readable, dependent: :delete_all, inverse_of: :readable
+      ReadMark.readable_classes << self
 
-        ReadMark.readable_classes << self
-
-        include Readable::InstanceMethods
-        extend Readable::ClassMethods
-        extend Readable::Scopes
-      end
-    end
-
-    def using_postgresql?
-      connection.adapter_name.match(/postgres/i)
+      include Readable::InstanceMethods
+      extend Readable::ClassMethods
+      extend Readable::Scopes
     end
   end
 end
