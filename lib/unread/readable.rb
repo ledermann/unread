@@ -8,7 +8,12 @@ module Unread
         Internal.assert_reader!(reader)
 
         if target == :all
-          reset_read_marks_for_user(reader)
+          # Called on a relation: mark only its records, not all records of the class
+          if current_scope
+            mark_collection_as_read(current_scope, reader)
+          else
+            reset_read_marks_for_user(reader)
+          end
         elsif target.respond_to?(:each)
           mark_collection_as_read(target, reader)
         else

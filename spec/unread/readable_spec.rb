@@ -224,6 +224,13 @@ RSpec.describe Unread::Readable do
       expect(sti_email.unread?(reader)).to be false
     end
 
+    it 'marks only the records of a relation with :all' do
+      Email.where(type: 'MultiLevelStiReadable').mark_as_read! :all, for: reader
+
+      expect(Email.unread_by(reader)).to eq [email]
+      expect(reader.read_mark_global(Email).timestamp).to be < email.updated_at
+    end
+
     it 'marks all objects as read' do
       Email.mark_as_read! :all, for: reader
 
