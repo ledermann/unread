@@ -39,7 +39,12 @@ The generator `unread:migration` changed for new installations:
 * The migration uses the current Rails migration version and a `change` method.
 * On MySQL, the table uses the default character set of the database. The old migration set `latin1`.
 * The column `reader_id` is `NOT NULL`.
+* The new option `--primary-key-type` sets the type of the id columns, for example `uuid`.
 
-You do not have to change existing `read_marks` tables.
+You do not have to change existing `read_marks` tables, but we recommend one change. Older releases created the column `timestamp` without fractional seconds. Then a record that a reader marks as read in the same second as its creation can stay unread. If `db/schema.rb` shows `precision: nil` for this column, add a migration:
+
+```ruby
+change_column :read_marks, :timestamp, :datetime, precision: 6
+```
 
 The generator `unread:polymorphic_reader_migration` was removed. If you upgrade from v0.6.3 or older, upgrade to v0.14.0 first. Then follow the [upgrade notes of v0.14.0](https://github.com/ledermann/unread/blob/v0.14.0/UPGRADE.md).

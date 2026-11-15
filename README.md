@@ -42,6 +42,8 @@ https://github.com/ledermann/unread/releases
    bin/rails db:migrate
    ```
 
+   If your models use UUID primary keys, add `--primary-key-type=uuid` to the generator command.
+
 
 ## Upgrade from previous releases
 
@@ -80,51 +82,38 @@ class Message < ApplicationRecord
   end
 end
 
+# A new user starts with all existing messages marked as read (see
+# "New readers" below). Thus, this example creates the users first.
+user1 = User.create!
+user2 = User.create!
+
 message1 = Message.create!
 message2 = Message.create!
 
 ## Get unread messages for a given user
-Message.unread_by(current_user)
+Message.unread_by(user1)
 # => [ message1, message2 ]
 
-message1.mark_as_read! for: current_user
-Message.unread_by(current_user)
+message1.mark_as_read! for: user1
+Message.unread_by(user1)
 # => [ message2 ]
 
-message1.read?(current_user)
+message1.read?(user1)
 # => true
 
 ## Get read messages for a given user
-Message.read_by(current_user)
-# => [ ]
-
-message1.mark_as_read! for: current_user
-Message.read_by(current_user)
+Message.read_by(user1)
 # => [ message1 ]
 
 ## Get all messages including the read status for a given user
-messages = Message.with_read_marks_for(current_user)
+messages = Message.with_read_marks_for(user1)
 # => [ message1, message2 ]
-messages[0].unread?(current_user)
+messages[0].unread?(user1)
 # => false
-messages[1].unread?(current_user)
+messages[1].unread?(user1)
 # => true
 
-Message.mark_as_read! :all, for: current_user
-Message.unread_by(current_user)
-# => [ ]
-
-Message.read_by(current_user)
-# => [ message1, message2 ]
-
 ## Get users that have not read a given message
-user1 = User.create!
-user2 = User.create!
-
-User.have_not_read(message1)
-# => [ user1, user2 ]
-
-message1.mark_as_read! for: user1
 User.have_not_read(message1)
 # => [ user2 ]
 
@@ -132,33 +121,44 @@ User.have_not_read(message1)
 User.have_read(message1)
 # => [ user1 ]
 
-message1.mark_as_read! for: user2
-User.have_read(message1)
-# => [ user1, user2 ]
-
-Message.mark_as_read! :all, for: user1
-User.have_not_read(message1)
-# => [ ]
-User.have_not_read(message2)
-# => [ user2 ]
-
-User.have_read(message1)
-# => [ user1, user2 ]
-User.have_read(message2)
-# => [ user1 ]
-
 ## Get all users including their read status for a given message
 users = User.with_read_marks_for(message1)
 # => [ user1, user2 ]
 users[0].have_read?(message1)
 # => true
-users[1].have_read?(message2)
+users[1].have_read?(message1)
 # => false
+
+## Mark some messages as read: an array or a relation
+Message.mark_as_read! [ message2 ], for: user1
+Message.where(id: message2.id).mark_as_read! :all, for: user2
+
+## Mark all messages as read
+Message.mark_as_read! :all, for: user2
+Message.unread_by(user2)
+# => [ ]
 
 # Optional: Remove read marks that are no longer necessary
 # Run this once a day, for example in a recurring job
 Message.cleanup_read_marks!
 ```
+
+### New readers
+
+A new reader starts with all existing records marked as read. For this, the gem calls the method `setup_new_reader` after it creates the reader. If you want new readers to see all existing records as unread, override the method:
+
+```ruby
+class User < ApplicationRecord
+  acts_as_reader
+
+  private
+
+  # All existing messages are unread for a new user
+  def setup_new_reader; end
+end
+```
+
+The gem knows a readable class only after Rails loads the class. Without eager loading, which is the default in development, `setup_new_reader` marks only the readable classes that Rails already loaded.
 
 ## Getting read/unread stats through a relationship
 
