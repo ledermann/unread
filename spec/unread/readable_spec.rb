@@ -141,6 +141,15 @@ RSpec.describe Unread::Readable do
     end
   end
 
+  describe '#read?' do
+    it 'is the opposite of unread?' do
+      email.mark_as_read! for: reader
+
+      expect(email.read?(reader)).to be true
+      expect(sti_email.read?(reader)).to be false
+    end
+  end
+
   describe '#mark_as_read!' do
     it 'marks a single object as read', :aggregate_failures do
       email.mark_as_read! for: reader

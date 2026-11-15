@@ -96,6 +96,10 @@ module Unread
         end
       end
 
+      def read?(reader)
+        !unread?(reader)
+      end
+
       def mark_as_read!(options)
         reader = options[:for]
         Internal.assert_reader!(reader)

@@ -18,7 +18,7 @@ The gem adds fewer methods to your models. These methods are the public API:
 * Reader class: `acts_as_reader`, `have_read`, `have_not_read`, `with_read_marks_for`, `reader_scope`
 * Reader instance: `have_read?`, `read_mark_global`
 * Readable class: `acts_as_readable`, `unread_by`, `read_by`, `with_read_marks_for`, `mark_as_read!`, `cleanup_read_marks!`, `read_scope`, `readable_options`
-* Readable instance: `unread?`, `mark_as_read!`
+* Readable instance: `unread?`, `read?`, `mark_as_read!`
 
 The other methods are now private or moved to `Unread::Internal`:
 

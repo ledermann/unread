@@ -91,6 +91,9 @@ message1.mark_as_read! for: current_user
 Message.unread_by(current_user)
 # => [ message2 ]
 
+message1.read?(current_user)
+# => true
+
 ## Get read messages for a given user
 Message.read_by(current_user)
 # => [ ]
